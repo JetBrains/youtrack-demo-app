@@ -1,6 +1,6 @@
 # YouTrack Demo App
 
-[![JetBrains team project](http://jb.gg/badges/team.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+![Team](https://jb.gg/badges/team-plastic.svg)
 
 Once installed into [JetBrains YouTrack](https://www.jetbrains.com/youtrack/), this App utilizes available extension points for demo reasons.
 
