@@ -1,7 +1,7 @@
 {
   "name": "yt-demo-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "App utilizes available extension points for demo reasons",
   "scripts": {
     "pack": "rm -rf archive_name.zip && cd src && zip -r ../archive_name.zip .",
     "upload": "youtrack-workflow upload src --host $YOUTRACK_URL"
