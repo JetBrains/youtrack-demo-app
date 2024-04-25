@@ -1,15 +1,10 @@
-function response(response, data) {
-  response.response = JSON.stringify(data);
-  response.addHeader("Content-Type", "application/json");
-}
-
 exports.httpHandler = {
   endpoints: [{
         scope: 'issue',
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          response(ctx.response, {test: true, scope: 'issue'});
+          ctx.response.json({test: true, scope: 'issue'});
         }
       },
 
@@ -18,7 +13,7 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          response(ctx.response, {test: true, scope: 'article'});
+          ctx.response.json({test: true, scope: 'article'});
         }
       },
       {
@@ -26,7 +21,7 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          response(ctx.response, {test: true, scope: 'project'});
+          ctx.response.json({test: true, scope: 'project'});
         }
       },
       {
@@ -34,14 +29,14 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          response(ctx.response, {test: true, scope: 'user'});
+          ctx.response.json({test: true, scope: 'user'});
         }
       },
       {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          response(ctx.response, {test: true, scope: 'global'});
+          ctx.response.json({test: true, scope: 'global'});
         }
       }
     ]
