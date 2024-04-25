@@ -121,7 +121,7 @@
     {
       "key": "dashboard-w",
       "name": "Dashboard widget",
-      "indexPath": "carpet/index.html",
+      "indexPath": "markdown/index.html",
       "extensionPoint": "DASHBOARD_WIDGET"
     }
   ],
