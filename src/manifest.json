@@ -1,12 +1,10 @@
 {
   "name": "yt-demo-app",
   "title": "YouTrack Demo App",
-  "description": null,
   "icon": "yt-logo.svg",
   "dependencies": {
     "@jetbrains/youtrack-scripting-api": "*"
   },
-  "language": "JS",
   "widgets": [
     {
       "key": "main-menu",
@@ -124,9 +122,5 @@
       "indexPath": "markdown/index.html",
       "extensionPoint": "DASHBOARD_WIDGET"
     }
-  ],
-  "youtrack": {
-    "autoAttached": false,
-    "visual": false
-  }
+  ]
 }
