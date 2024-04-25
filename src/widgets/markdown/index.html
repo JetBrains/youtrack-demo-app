@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/@jetbrains/ring-ui-built@6/components/style.css">
+    <link rel="stylesheet" href="../index.css">
+</head>
+<body class="plugin">
+   
+    <div id="root"></div>
+
+    <script type="module">
+        const host = await YTApp.register({
+            onConfigure: renderConfigMode
+        });
+        let config = await host.readConfig();
+        const root = document.getElementById('root');
+
+        if (!config) {
+            renderConfigMode();
+            host.enterConfigMode();
+        } else {
+            renderViewMode();
+        }
+
+        function renderViewMode() {
+            root.innerHTML = `
+                <section style="padding: 16px 0;">Configuration = <span style="font-weight: bold;" id="value"></span></section>
+            `;
+            root.querySelector('#value').textContent = config.someValue
+        }
+
+        function renderConfigMode() {
+            root.innerHTML = `
+            <form class="ring-form" style="padding: 16px 0;">
+                <span class="ring-form__title">Widget configuration example</span>
+                
+                <div class="ring-form__group">
+                    <label class="ring-form__label">Type some value</label>
+                    <div class="ring-form__control">
+                        <input class="ring-input ring-input-size_m" id="some-value"/>
+                    </div>
+                </div>
+
+                <button id="save" type="button">Save</button> 
+            </form>
+            `;
+
+            root.querySelector('#some-value').value = config?.someValue ?? '';
+
+            root.querySelector('#save').addEventListener('click', async e => {
+                const someValue = root.querySelector('#some-value').value;
+                config = {someValue}
+                await host.storeConfig(config);
+                renderViewMode();
+                await host.exitConfigMode();
+            })
+        }
+    </script>
+</body>
+</html>

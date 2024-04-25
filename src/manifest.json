@@ -33,8 +33,8 @@
     },
     {
       "key": "mark",
-      "name": "Cat of the day in markdown",
-      "indexPath": "cats/index.html",
+      "name": "Demo MD widget",
+      "indexPath": "markdown/index.html",
       "extensionPoint": "MARKDOWN"
     },
 
