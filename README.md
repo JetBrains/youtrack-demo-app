@@ -17,6 +17,6 @@ Once installed into [JetBrains YouTrack](https://www.jetbrains.com/youtrack/), t
 #### CLI way (useful for developing)
 
 1. `npm install`
-2. `YOUTRACK_URL="YOUR_YOUTRACK_URL_HERE" npm run pack && npm run upload -- --token perm:cm9vdA==.NTA...`, where token is a permanent token, granted on `%YOUTRACK_URL%/youtrack/users/me?tab=account-security`
+2. `npm run pack && npm run upload -- --host %YOUTRACK_URL% --token perm:cm9vdA==.NT...`, where token is a permanent token, granted on `%YOUTRACK_URL%/youtrack/users/me?tab=account-security`
 3. Attach to desired projects, as described above
 4. Apply changes to sources and repat p.2 

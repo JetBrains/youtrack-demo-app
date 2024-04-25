@@ -4,7 +4,7 @@
   "description": "App utilizes available extension points for demo reasons",
   "scripts": {
     "pack": "rm -rf archive_name.zip && cd src && zip -r ../archive_name.zip .",
-    "upload": "youtrack-workflow upload src --host $YOUTRACK_URL"
+    "upload": "youtrack-workflow upload src"
   },
   "author": "Andrey Skladchikov",
   "license": "Apache-2.0",
