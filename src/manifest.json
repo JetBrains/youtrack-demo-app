@@ -139,7 +139,7 @@
       "key": "hd-channel",
       "name": "Some fancy channel",
       "description": "This channel is about some very custom integration",
-      "iconPath": "jetbrains.png",
+      "iconPath": "jetbrains-simple.svg",
       "indexPath": "admin/index.html",
       "extensionPoint": "HELPDESK_CHANNEL"
     },
