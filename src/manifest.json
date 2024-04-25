@@ -10,10 +10,16 @@
   "widgets": [
     {
       "key": "main-menu",
-      "name": "Menu Item long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long",
+      "name": "Main menu item",
       "indexPath": "admin/index.html",
-      "extensionPoint": "MAIN_MENU_ITEM",
-      "permissions": ["READ_USER"]
+      "extensionPoint": "MAIN_MENU_ITEM"
+    },
+
+    {
+      "key": "fields-first",
+      "name": "Cat of the day",
+      "indexPath": "cats/index.html",
+      "extensionPoint": "ISSUE_FIELD_PANEL_FIRST"
     },
 
     {
@@ -25,37 +31,16 @@
         "height": 200
       }
     },
-
-    {
-      "key": "fields-last2",
-      "name": "Cat of the day bottom2",
-      "indexPath": "cats/index.html",
-      "extensionPoint": "ISSUE_FIELD_PANEL_LAST"
-    },
-    {
-      "key": "fields-first",
-      "name": "Cat of the day",
-      "indexPath": "cats/index.html",
-      "extensionPoint": "ISSUE_FIELD_PANEL_FIRST"
-    },
     {
       "key": "mark",
       "name": "Cat of the day in markdown",
       "indexPath": "cats/index.html",
       "extensionPoint": "MARKDOWN"
     },
-    {
-      "key": "fields-first2",
-      "name": "Another cat of the day long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long",
-      "indexPath": "cats/index.html",
-      "extensionPoint": "ISSUE_FIELD_PANEL_FIRST",
-      "expectedDimensions": {
-        "height": 300
-      }
-    },
+
     {
       "key": "issue-option",
-      "name": "Demo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar itemDemo app toolbar item",
+      "name": "Demo app toolbar",
       "indexPath": "index.html",
       "extensionPoint": "ISSUE_OPTIONS_MENU_ITEM",
       "expectedDimensions": {
@@ -73,30 +58,12 @@
       }
     },
     {
-      "key": "below-s2",
-      "name": "Another quote of the day top",
-      "indexPath": "quotes/index.html",
-      "extensionPoint": "ISSUE_BELOW_SUMMARY",
-      "expectedDimensions": {
-        "height": 100
-      }
-    },
-    {
       "key": "above-activity1",
       "name": "Quote of the day bottom",
       "indexPath": "quotes/index.html",
       "extensionPoint": "ISSUE_ABOVE_ACTIVITY_STREAM",
       "expectedDimensions": {
         "height": 100
-      }
-    },
-    {
-      "key": "above-activity2",
-      "name": "Another quote of the day bottom",
-      "indexPath": "quotes/index.html",
-      "extensionPoint": "ISSUE_ABOVE_ACTIVITY_STREAM",
-      "expectedDimensions": {
-        "height": 300
       }
     },
 
@@ -113,26 +80,16 @@
 
     {
       "key": "project-tab",
-      "name": "Comfigure me dedicated Admin Page with long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long",
+      "name": "Comfigure me",
       "indexPath": "admin/index.html",
       "extensionPoint": "PROJECT_SETTINGS"
     },
 
     {
       "key": "admin-menu",
-      "name": "Dedicated Admin Page with long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long",
+      "name": "Dedicated Admin Page",
       "indexPath": "admin/index.html",
       "extensionPoint": "ADMINISTRATION_MENU_ITEM"
-    },
-
-    {
-      "key": "app-setting",
-      "name": "plugin administration",
-      "indexPath": "admin/index.html",
-      "extensionPoint": "APP_SETTINGS",
-      "expectedDimensions": {
-        "height": 40
-      }
     },
 
     {
@@ -146,7 +103,7 @@
 
     {
       "key": "profile-tab",
-      "name": "Comfigure me user dedicated Admin Page with long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long",
+      "name": "Comfigure me",
       "indexPath": "admin/index.html",
       "extensionPoint": "USER_PROFILE_SETTINGS"
     },
@@ -160,46 +117,10 @@
         "width": 1000
       }
     },
-    {
-      "key": "user-card2",
-      "name": "Custom user information2",
-      "indexPath": "user-card/index.html",
-      "extensionPoint": "USER_CARD",
-      "expectedDimensions": {
-        "height": 200,
-        "width": 1000
-      }
-    },
-    {
-      "key": "user-card3",
-      "name": "Custom user information3",
-      "indexPath": "user-card/index.html",
-      "extensionPoint": "USER_CARD",
-      "expectedDimensions": {
-        "height": 200,
-        "width": 1000
-      }
-    },
-    {
-      "key": "user-card4",
-      "name": "Custom user information4",
-      "indexPath": "user-card/index.html",
-      "extensionPoint": "USER_CARD",
-      "expectedDimensions": {
-        "height": 200,
-        "width": 1000
-      }
-    },
-    {
-      "key": "markdown-2",
-      "name": "markdown long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long",
-      "indexPath": "carpet/index.html",
-      "extensionPoint": "MARKDOWN"
-    },
 
     {
       "key": "dashboard-w",
-      "name": "Dashboard widget long long long long long long long long long long long long long long long long long long long ng long long long long long long long long long long long long ng long long long long long long long long long long long long ng long long long long long long long long long long long long ng long long long long long long long long long long long long ng long long long long long long long long long long long long long long long",
+      "name": "Dashboard widget",
       "indexPath": "carpet/index.html",
       "extensionPoint": "DASHBOARD_WIDGET"
     }
