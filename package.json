@@ -1,0 +1,14 @@
+{
+  "name": "yt-demo-app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "pack": "rm -rf archive_name.zip && cd src && zip -r ../archive_name.zip .",
+    "upload": "youtrack-workflow upload src --host $YOUTRACK_URL"
+  },
+  "author": "Andrey Skladchikov",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@jetbrains/youtrack-scripting": "0.0.30"
+  }
+}

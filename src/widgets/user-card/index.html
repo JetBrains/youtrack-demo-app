@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/@jetbrains/ring-ui-built@6/components/style.css">
+    <link rel="stylesheet" href="../index.css">
+</head>
+<body class="plugin">
+   
+    <div id="root"></div>
+
+      <script type="module">
+        const host = await YTApp.register();
+
+        async function loadAndShowUser() {
+            const user = await host.fetchYouTrack(`users/${YTApp.entity.id}?fields=id,login,name`);
+
+            
+            document.getElementById('root')
+                .innerHTML = `The user <b>${user.name}</b> is known as a good man`
+        }
+
+        loadAndShowUser();
+      </script>
+</body>
+</html>

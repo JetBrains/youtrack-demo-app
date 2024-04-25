@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/@jetbrains/ring-ui-built@6/components/style.css">
+    <link rel="stylesheet" href="../index.css">
+</head>
+<body class="plugin" style="padding: 0; overflow: hidden;">
+   
+    <div id="root">
+      
+    </div>
+
+    <script type="module">
+      const host = await YTApp.register();
+      console.log('init cat widget', host)
+
+      var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+      var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+      const img = document.createElement('img');
+      img.src = `https://cataas.com/cat?width=${viewportWidth}`;
+      img.width = viewportWidth;
+      img.height = viewportHeight;
+      img.style = `object-fit: cover;`;
+      document.getElementById('root').appendChild(img);
+    </script>
+</body>
+</html>
