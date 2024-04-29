@@ -35,6 +35,11 @@
       "type": "string",
       "enum": ["Never", "Daily", "Weekly", "Monthly"]
     },
+    "perProjectValue": {
+      "title": "A value that can be only set on Project level",
+      "type": "string",
+	    "x-scope": "project"
+    },
     "entity": {
       "title": "User",
       "type": "object",
