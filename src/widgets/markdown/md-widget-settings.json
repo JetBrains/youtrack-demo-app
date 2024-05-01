@@ -1,0 +1,10 @@
+{
+    "title": "Markdown Widget Settings",
+    "type": "object",
+    "properties": {
+      "someValue": {
+        "title": "Some string setting",
+        "type": "string"
+      }
+    }
+  }
