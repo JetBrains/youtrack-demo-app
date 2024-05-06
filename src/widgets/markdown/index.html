@@ -15,7 +15,7 @@
         let config = await host.readConfig();
         const root = document.getElementById('root');
 
-        if (!config) {
+        if (!config?.someValue) {
             renderConfigMode();
             host.enterConfigMode();
         } else {
