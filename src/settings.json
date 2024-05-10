@@ -48,7 +48,6 @@
     "projects": {
       "title": "Some project",
       "type": "array",
-      "x-entity": "Project",
       "items": {
         "x-entity": "Project",
         "type": "object"
