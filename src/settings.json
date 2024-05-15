@@ -40,6 +40,11 @@
       "type": "string",
 	    "x-scope": "project"
     },
+    "globalOnlyValue": {
+      "title": "A value that can be only set on Global level",
+      "type": "string",
+	    "x-scope": "global"
+    },
     "entity": {
       "title": "User",
       "type": "object",
