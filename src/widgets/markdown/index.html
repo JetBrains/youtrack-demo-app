@@ -41,7 +41,8 @@
                     </div>
                 </div>
 
-                <button id="save" type="button">Save</button> 
+                <button id="save" type="button">Save</button>
+                <button id="cancel" type="button">Cancel</button> 
             </form>
             `;
 
@@ -52,6 +53,10 @@
                 config = {someValue}
                 await host.storeConfig(config);
                 renderViewMode();
+                await host.exitConfigMode();
+            });
+
+            root.querySelector('#cancel').addEventListener('click', async () => {
                 await host.exitConfigMode();
             })
         }
