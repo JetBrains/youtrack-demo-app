@@ -76,6 +76,12 @@
         "width": 400
       }
     },
+    {
+      "key": "article-above-activity",
+      "name": "Article above activity",
+      "indexPath": "index.html",
+      "extensionPoint": "ARTICLE_ABOVE_ACTIVITY_STREAM"
+    },
 
     {
       "key": "project-tab",
