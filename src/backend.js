@@ -36,7 +36,8 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          ctx.response.json({test: true, scope: 'global'});
+          const {name} = ctx.settings;
+          ctx.response.json({test: true, scope: 'global', name});
         }
       }
     ]
