@@ -1,6 +1,7 @@
 {
   "name": "yt-demo-app",
   "title": "YouTrack Demo App",
+  "version": "1.0.0",
   "icon": "demo-app-logo.svg",
   "dependencies": {
     "@jetbrains/youtrack-scripting-api": "*"

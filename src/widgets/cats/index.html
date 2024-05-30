@@ -23,6 +23,10 @@
       img.height = viewportHeight;
       img.style = `object-fit: cover;`;
       document.getElementById('root').appendChild(img);
+
+      img.addEventListener('click', () => {
+        host.collapse();
+      });
     </script>
 </body>
 </html>
