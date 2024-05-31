@@ -2,12 +2,12 @@ const host = await YTApp.register();
 
 async function main() {
   try {
-  const pluginResponse = await host.fetchApp('backend/demo', {scope: true});
+  const scopedResponse = await host.fetchApp('backend/demo', {scope: true});
   const globalResponse = await host.fetchApp('backend/demo', {});
-  const postResponse = await host.fetchApp('backend/demo', {method: 'POST'});
+  const postResponse = await host.fetchApp('backend/demo', {method: 'POST', query: {test: 123}, body: {testBody: 'test'}});
 
 
-  console.log('[YT Demo App] pluginResponse', pluginResponse);
+  console.log('[YT Demo App] pluginResponse', scopedResponse);
   console.log('[YT Demo App] globalResponse', globalResponse);
   console.log('[YT Demo App] postResponse', postResponse);
 
