@@ -4,7 +4,7 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          ctx.response.json({test: true, scope: 'issue'});
+          ctx.response.json({test: true, scope: 'issue', issueSummary: ctx.issue.summary});
         }
       },
 
@@ -13,7 +13,7 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          ctx.response.json({test: true, scope: 'article'});
+          ctx.response.json({test: true, scope: 'article', articleSummary: ctx.article.summary});
         }
       },
       {
@@ -21,7 +21,7 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          ctx.response.json({test: true, scope: 'project'});
+          ctx.response.json({test: true, scope: 'project', projectName: ctx.project.name});
         }
       },
       {
@@ -29,7 +29,7 @@ exports.httpHandler = {
         method: 'GET', 
         path: 'demo',
         handle: function (ctx) {
-          ctx.response.json({test: true, scope: 'user'});
+          ctx.response.json({test: true, scope: 'user', userName: ctx.user.name});
         }
       },
       {
