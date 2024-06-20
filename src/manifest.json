@@ -82,12 +82,7 @@
         "width": 400
       }
     },
-    {
-      "key": "article-below-summary",
-      "name": "Article below summary",
-      "indexPath": "index.html",
-      "extensionPoint": "ARTICLE_BELOW_SUMMARY"
-    },
+
     {
       "key": "article-above-activity",
       "name": "Article above activity",
