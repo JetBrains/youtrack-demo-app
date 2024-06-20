@@ -1,10 +1,15 @@
 {
   "name": "yt-demo-app",
   "title": "YouTrack Demo App",
+  "description": "YouTrack Demo App to show different types of widgets",
   "version": "1.0.0",
   "icon": "demo-app-logo.svg",
-  "dependencies": {
-    "@jetbrains/youtrack-scripting-api": "*"
+  "url": "https://github.com/JetBrains/youtrack-demo-app",
+  "minYouTrackVersion": "2024.2",
+  "vendor": {
+    "name": "JetBrains s.r.o.",
+    "url": "https://jetbrains.com",
+    "email": "support@jetbrains.com"
   },
   "widgets": [
     {
