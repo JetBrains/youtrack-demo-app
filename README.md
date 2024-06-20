@@ -4,7 +4,7 @@
 
 Once installed into [JetBrains YouTrack](https://www.jetbrains.com/youtrack/), this App utilizes available extension points for demo reasons.
 
-### Installation
+### Installation 
 
 #### Manual way
 
