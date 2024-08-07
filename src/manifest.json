@@ -141,6 +141,7 @@
     {
       "key": "dashboard-w",
       "name": "Dashboard widget",
+      "iconPath": "jetbrains-simple.svg",
       "indexPath": "markdown/index.html",
       "extensionPoint": "DASHBOARD_WIDGET"
     }
