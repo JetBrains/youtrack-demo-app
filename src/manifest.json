@@ -143,7 +143,8 @@
       "name": "Dashboard widget",
       "iconPath": "jetbrains-simple.svg",
       "indexPath": "markdown/index.html",
-      "extensionPoint": "DASHBOARD_WIDGET"
+      "extensionPoint": "DASHBOARD_WIDGET",
+      "permissions": ["UPDATE_USER"]
     }
   ]
 }
