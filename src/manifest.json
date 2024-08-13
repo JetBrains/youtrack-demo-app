@@ -144,6 +144,7 @@
       "iconPath": "jetbrains-simple.svg",
       "indexPath": "markdown/index.html",
       "extensionPoint": "DASHBOARD_WIDGET",
+      "settingsSchemaPath": "markdown/md-widget-settings.json",
       "permissions": ["UPDATE_USER"]
     }
   ]
