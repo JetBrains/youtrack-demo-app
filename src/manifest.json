@@ -40,6 +40,7 @@
       "name": "Demo MD widget",
       "indexPath": "markdown/index.html",
       "extensionPoint": "MARKDOWN",
+      "iconPath": "jetbrains-simple.svg",
       "settingsSchemaPath": "markdown/md-widget-settings.json"
     },
 
