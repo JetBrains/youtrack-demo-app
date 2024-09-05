@@ -2,6 +2,7 @@
   "name": "yt-demo-app",
   "title": "YouTrack Demo App",
   "description": "YouTrack Demo App to show different types of widgets",
+  "$schema": "https://json.schemastore.org/youtrack-app.json",
   "version": "1.0.0",
   "icon": "demo-app-logo.svg",
   "url": "https://github.com/JetBrains/youtrack-demo-app",
@@ -76,7 +77,7 @@
     {
       "key": "article-menu",
       "name": "Article toolbar",
-      "indexPath": "index.html?7",
+      "indexPath": "index.html",
       "extensionPoint": "ARTICLE_OPTIONS_MENU_ITEM",
       "expectedDimensions": {
         "height": 400,
