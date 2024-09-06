@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "App utilizes available extension points for demo reasons",
   "scripts": {
+    "check": "youtrack-app validate src",
     "pack": "rm -rf archive_name.zip && cd src && zip -r ../archive_name.zip .",
     "upload": "youtrack-app upload src"
   },
   "author": "Andrey Skladchikov",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@jetbrains/youtrack-apps-tools": "0.0.1-alpha.5"
+    "@jetbrains/youtrack-apps-tools": "0.0.1-alpha.13"
   }
 }
