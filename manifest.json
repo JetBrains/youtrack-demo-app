@@ -1,12 +1,12 @@
 {
-  "name": "yt-demo-app",
-  "title": "YouTrack Demo App",
-  "description": "YouTrack Demo App to show different types of widgets",
+  "name" : "yt-demo-app",
+  "title" : "YouTrack Demo App",
+  "description" :  "App utilizes available extension points for demo reasons",
   "$schema": "https://json.schemastore.org/youtrack-app.json",
   "version": "1.0.0",
   "icon": "demo-app-logo.svg",
   "url": "https://github.com/JetBrains/youtrack-demo-app",
-  "minYouTrackVersion": "2024.2.0",
+  "minYouTrackVersion": "2024.3.0",
   "vendor": {
     "name": "JetBrains s.r.o.",
     "url": "https://jetbrains.com",
@@ -14,10 +14,13 @@
   },
   "widgets": [
     {
-      "key": "main-menu",
-      "name": "Main menu item",
-      "indexPath": "admin/index.html",
-      "extensionPoint": "MAIN_MENU_ITEM"
+      "key": "full-page",
+      "name": "Full Page",
+      "indexPath": "full-page/index.html",
+      "extensionPoint": "MAIN_MENU_ITEM",
+      "description": "Main menu item",
+      "iconPath": "full-page/widget-icon.svg",
+      "permissions": []     
     },
 
     {
@@ -48,7 +51,7 @@
     {
       "key": "issue-option",
       "name": "Demo app toolbar",
-      "indexPath": "index.html",
+      "indexPath": "lorem/index.html",
       "extensionPoint": "ISSUE_OPTIONS_MENU_ITEM",
       "expectedDimensions": {
         "height": 1000,
@@ -77,7 +80,7 @@
     {
       "key": "article-menu",
       "name": "Article toolbar",
-      "indexPath": "index.html",
+      "indexPath": "lorem/index.html",
       "extensionPoint": "ARTICLE_OPTIONS_MENU_ITEM",
       "expectedDimensions": {
         "height": 400,
@@ -89,28 +92,28 @@
     {
       "key": "article-below-summary",
       "name": "Article below summary",
-      "indexPath": "index.html",
+      "indexPath": "lorem/index.html",
       "extensionPoint": "ARTICLE_BELOW_SUMMARY"
     },
 
     {
       "key": "article-above-activity",
       "name": "Article above activity",
-      "indexPath": "index.html",
+      "indexPath": "lorem/index.html",
       "extensionPoint": "ARTICLE_ABOVE_ACTIVITY_STREAM"
     },
 
     {
       "key": "project-tab",
       "name": "Comfigure me",
-      "indexPath": "admin/index.html",
+      "indexPath": "full-page/index.html",
       "extensionPoint": "PROJECT_SETTINGS"
     },
 
     {
       "key": "admin-menu",
       "name": "Dedicated Admin Page",
-      "indexPath": "admin/index.html",
+      "indexPath": "full-page/index.html",
       "extensionPoint": "ADMINISTRATION_MENU_ITEM"
     },
 
@@ -119,14 +122,14 @@
       "name": "Some fancy channel",
       "description": "This channel is about some very custom integration",
       "iconPath": "jetbrains-simple.svg",
-      "indexPath": "admin/index.html",
+      "indexPath": "full-page/index.html",
       "extensionPoint": "HELPDESK_CHANNEL"
     },
 
     {
       "key": "profile-tab",
       "name": "Comfigure me",
-      "indexPath": "admin/index.html",
+      "indexPath": "full-page/index.html",
       "extensionPoint": "USER_PROFILE_SETTINGS"
     },
     {

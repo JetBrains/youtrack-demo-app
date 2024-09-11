@@ -1,0 +1,10 @@
+.widget {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ring-unit) * 2);
+  padding: calc(var(--ring-unit) * 2);
+}
+
+.config-buttons {
+  margin-top: calc(var(--ring-unit) * 2);
+}
