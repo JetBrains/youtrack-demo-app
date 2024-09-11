@@ -105,7 +105,7 @@
 
     {
       "key": "project-tab",
-      "name": "Comfigure me",
+      "name": "Configure me",
       "indexPath": "full-page/index.html",
       "extensionPoint": "PROJECT_SETTINGS"
     },
@@ -128,7 +128,7 @@
 
     {
       "key": "profile-tab",
-      "name": "Comfigure me",
+      "name": "Configure me",
       "indexPath": "full-page/index.html",
       "extensionPoint": "USER_PROFILE_SETTINGS"
     },
