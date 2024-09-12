@@ -2,7 +2,7 @@ import React, {memo, useEffect} from 'react';
 import {ControlsHeightContext, ControlsHeight} from '@jetbrains/ring-ui-built/components/global/controls-height';
 import type {CustomWidgetAPILayer} from '../../../@types/globals';
 import {Configuration} from './configuration';
-import { WidgetConfiguration } from './types';
+import {WidgetConfiguration} from './types';
 
 
 interface Props {}
@@ -26,23 +26,23 @@ const AppComponent: React.FunctionComponent<Props> = () => {
 
       hostRef.current = host;
 
-      const config = await hostRef.current!.readConfig<WidgetConfiguration>();
-      if (!config?.someValue) {
+      const configValue = await hostRef.current!.readConfig<WidgetConfiguration>();
+      if (!configValue?.someValue) {
         hostRef.current.enterConfigMode();
         setIsConfiguring(true);
       } else {
-        setConfig(config);
+        setConfig(configValue);
       }
     }
 
     register();
   }, []);
 
-  const doneConfiguring = React.useCallback((config?: WidgetConfiguration) => {
-    setConfig(config ?? null);
+  const doneConfiguring = React.useCallback((newConfig?: WidgetConfiguration) => {
+    setConfig(newConfig ?? null);
     setIsConfiguring(false);
-    if (config) {
-      hostRef.current?.storeConfig(config);
+    if (newConfig) {
+      hostRef.current?.storeConfig(newConfig);
     }
     hostRef.current?.exitConfigMode();
   }, []);
@@ -50,14 +50,16 @@ const AppComponent: React.FunctionComponent<Props> = () => {
   return (
     <div className="widget">
       <ControlsHeightContext.Provider value={ControlsHeight.S}>
-        {isConfiguring && hostRef.current ? (
-          <Configuration onDone={doneConfiguring}/>
-        ) : (
-          <section>
-          {'Configuration = '}
-          <span style={{fontWeight: 'bold'}}>{config?.someValue}</span>
-        </section>
-        )}
+        {isConfiguring && hostRef.current
+          ? (
+            <Configuration onDone={doneConfiguring}/>
+          )
+          : (
+            <section>
+              {'Configuration = '}
+              <span style={{fontWeight: 'bold'}}>{config?.someValue}</span>
+            </section>
+          )}
 
       </ControlsHeightContext.Provider>
     </div>

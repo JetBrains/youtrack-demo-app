@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-undef
 exports.httpHandler = {
   endpoints: [
     {

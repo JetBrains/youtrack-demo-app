@@ -1,6 +1,5 @@
 
 // See https://www.jetbrains.com/help/youtrack/devportal-apps/apps-reference-http-handlers.html
-// eslint-disable-next-line no-undef
 exports.httpHandler = {
   endpoints: [
     {

@@ -3,8 +3,7 @@ import Input from '@jetbrains/ring-ui-built/components/input/input';
 import Button from '@jetbrains/ring-ui-built/components/button/button';
 import ButtonSet from '@jetbrains/ring-ui-built/components/button-set/button-set';
 
-import type {CustomWidgetAPILayer} from '../../../@types/globals';
-import { WidgetConfiguration } from './types';
+import {WidgetConfiguration} from './types';
 
 
 interface Props {
@@ -18,12 +17,12 @@ const ConfigurationComponent: React.FunctionComponent<Props> = ({onDone}) => {
     setValue(e.target.value);
   }, []);
 
-  const onSubmit = React.useCallback(async (e: React.MouseEvent) => {
+  const onSubmit = React.useCallback(async () => {
     if (!value) {
       return;
     }
     onDone({someValue: value});
-  }, [value]);
+  }, [onDone, value]);
 
   return (
     <form className="ring-form">
