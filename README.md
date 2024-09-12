@@ -8,11 +8,13 @@ Once installed into [JetBrains YouTrack](https://www.jetbrains.com/youtrack/), t
 
 #### Manual way
 
-1. Archive "src" folder into a single ZIP file
-2. Go to `%YOUTRACK_URL%/admin/apps` (you need admin permissions to do so)
-3. Import app from ZIP archive
-4. Attach app to desired projects on `%YOUTRACK_URL%/admin/editProject/%PROJECT_ID%?tab=apps` page
-5. Open an issue in desired project and check App widgets appear
+1. `npm install`
+2. `npm run build`
+3. Archive "dist" folder into a single ZIP file
+4. Go to `%YOUTRACK_URL%/admin/apps` (you need admin permissions to do so)
+5. Import app from ZIP archive
+6. Attach app to desired projects on `%YOUTRACK_URL%/admin/editProject/%PROJECT_ID%?tab=apps` page
+7. Open an issue in desired project and check App widgets appear
 
 #### CLI way (useful for developing)
 
