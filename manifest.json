@@ -134,12 +134,11 @@
     },
     {
       "key": "user-card1",
-      "name": "Custom user information1",
+      "name": "User Card Widget",
       "indexPath": "user-card/index.html",
       "extensionPoint": "USER_CARD",
       "expectedDimensions": {
-        "height": 200,
-        "width": 1000
+        "height": 10
       }
     },
 

@@ -27,7 +27,7 @@ const UserCardComponent: React.FunctionComponent<Props> = ({host}) => {
 
   return (
     <div>
-      <Link target="_blank" href={`mailto:${user.email}`}>Email ${user.login}</Link>
+      <Link target="_blank" href={`mailto:${user.email}`}>Email {user.login}</Link>
     </div>
   );
 };
