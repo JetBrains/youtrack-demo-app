@@ -62,10 +62,7 @@
       "key": "below-s1",
       "name": "Quote of the day top",
       "indexPath": "quotes/index.html",
-      "extensionPoint": "ISSUE_BELOW_SUMMARY",
-      "expectedDimensions": {
-        "height": 100
-      }
+      "extensionPoint": "ISSUE_BELOW_SUMMARY"
     },
     {
       "key": "above-activity1",
