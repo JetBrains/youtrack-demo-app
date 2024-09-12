@@ -1,5 +1,4 @@
 import React, {memo, useEffect} from 'react';
-import {ControlsHeightContext, ControlsHeight} from '@jetbrains/ring-ui-built/components/global/controls-height';
 import type {CustomWidgetAPILayer} from '../../../@types/globals';
 import {Configuration} from './configuration';
 import {WidgetConfiguration} from './types';
@@ -49,19 +48,17 @@ const AppComponent: React.FunctionComponent<Props> = () => {
 
   return (
     <div className="widget">
-      <ControlsHeightContext.Provider value={ControlsHeight.S}>
-        {isConfiguring && hostRef.current
-          ? (
-            <Configuration onDone={doneConfiguring}/>
-          )
-          : (
-            <section>
-              {'Configuration = '}
-              <span style={{fontWeight: 'bold'}}>{config?.someValue}</span>
-            </section>
-          )}
+      {isConfiguring && hostRef.current
+        ? (
+          <Configuration onDone={doneConfiguring}/>
+        )
+        : (
+          <section>
+            {'Configuration = '}
+            <span style={{fontWeight: 'bold'}}>{config?.someValue}</span>
+          </section>
+        )}
 
-      </ControlsHeightContext.Provider>
     </div>
   );
 };

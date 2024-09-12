@@ -1,5 +1,4 @@
 import React, {memo, useCallback} from 'react';
-import {ControlsHeightContext, ControlsHeight} from '@jetbrains/ring-ui-built/components/global/controls-height';
 import Button from '@jetbrains/ring-ui-built/components/button/button';
 import Heading from '@jetbrains/ring-ui-built/components/heading/heading';
 import Input from '@jetbrains/ring-ui-built/components/input/input';
@@ -27,27 +26,25 @@ const AppComponent: React.FunctionComponent<Props> = ({host}) => {
 
   return (
     <div className="widget">
-      <ControlsHeightContext.Provider value={ControlsHeight.S}>
-        <Heading>
-          {'This is a full-screen page'}
+      <Heading>
+        {'This is a full-screen page'}
+      </Heading>
+      <form>
+        <Heading level={3}>
+          {'Here is a simple form example'}
         </Heading>
-        <form>
-          <Heading level={3}>
-            {'Here is a simple form example'}
-          </Heading>
 
-          <Input label="Labeled input" value={val1} onChange={e => setVal1(e.target.value)}/>
-          <Input name="login" label="Label and hint" placeholder="Hint" value={val2} onChange={e => setVal2(e.target.value)}/>
+        <Input label="Labeled input" value={val1} onChange={e => setVal1(e.target.value)}/>
+        <Input name="login" label="Label and hint" placeholder="Hint" value={val2} onChange={e => setVal2(e.target.value)}/>
 
 
-          <Panel className="form-panel">
-            <Group>
-              <Button primary onClick={callBackend}>{'Save'}</Button>
-              {success && <Text>{'Saved!'}</Text>}
-            </Group>
-          </Panel>
-        </form>
-      </ControlsHeightContext.Provider>
+        <Panel className="form-panel">
+          <Group>
+            <Button primary onClick={callBackend}>{'Save'}</Button>
+            {success && <Text>{'Saved!'}</Text>}
+          </Group>
+        </Panel>
+      </form>
     </div>
   );
 };
