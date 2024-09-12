@@ -25,14 +25,14 @@ interface BaseAPILayer {
  * This layer should allow plugin to call YT endpoints while being sure there is just ONE YouTrack instance
  */
 export interface InstanceAwareAPILayer extends BaseAPILayer {
-  fetchYouTrack: (relativeURL: string, requestParams: RequestParams) => Promise<unknown>;
+  fetchYouTrack: <T = unknown>(relativeURL: string, requestParams?: RequestParams) => Promise<T>;
 }
 
 /*
  * This layer allows plugin to communicate with own backend
  */
 export interface PluginEndpointAPILayer extends InstanceAwareAPILayer {
-  fetchApp: (relativeURL: string, requestParams: RequestParams & {scope?: boolean}) => Promise<unknown>;
+  fetchApp: <T = unknown>(relativeURL: string, requestParams: RequestParams & {scope?: boolean}) => Promise<T>;
 }
 
 /*
