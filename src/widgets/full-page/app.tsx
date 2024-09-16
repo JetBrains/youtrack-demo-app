@@ -17,8 +17,16 @@ const AppComponent: React.FunctionComponent<Props> = ({host}) => {
   const [val2, setVal2] = React.useState('');
   const [success, setSuccess] = React.useState(false);
 
+  React.useEffect(() => {
+    host.fetchApp<{val1?: string, val2?: string}>('backend-global/demo', {query: {test: 'test'}}).
+      then(persisted => {
+        setVal1(persisted.val1 ?? '');
+        setVal2(persisted.val2 ?? '');
+      });
+  }, [host]);
+
   const callBackend = useCallback(async () => {
-    const result = await host.fetchApp('backend-global/demo', {query: {val1, val2}});
+    const result = await host.fetchApp('backend-global/demo', {method: 'POST', body: {val1, val2}});
     // eslint-disable-next-line no-console
     console.log('request result', result);
     setSuccess(true);

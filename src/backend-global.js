@@ -14,9 +14,18 @@ exports.httpHandler = {
       method: 'GET',
       path: 'demo',
       handle: function handle(ctx) {
-        const val1 = ctx.request.getParameter('val1');
+        const {demoString1, demoString2} = ctx.globalStorage.extensionProperties;
+        const testQueryParam = ctx.request.getParameter('test');
         const {name} = ctx.settings;
-        ctx.response.json({test: true, scope: 'global', name, val1});
+
+        ctx.response.json({
+          test: true,
+          scope: 'global',
+          name,
+          testQueryParam,
+          val1: demoString1,
+          val2: demoString2
+        });
       }
     },
     {
@@ -24,7 +33,13 @@ exports.httpHandler = {
       path: 'demo',
       handle: function handle(ctx) {
         const {name} = ctx.settings;
-        ctx.response.json({test: true, name, scope: 'global', method: 'POST'});
+        const body = ctx.request.json();
+        ctx.globalStorage.extensionProperties.demoString1 = body.val1;
+        ctx.globalStorage.extensionProperties.demoString2 = body.val2;
+        // eslint-disable-next-line no-console
+        console.log('Updated storage', body);
+
+        ctx.response.json({test: true, name, scope: 'global', method: 'POST', receiveBody: body});
       }
     }
   ]

@@ -1,0 +1,15 @@
+{
+  "entityTypeExtensions": [
+    {
+      "entityType": "AppGlobalStorage",
+      "properties": {
+        "demoString1": {
+          "type": "string"
+        },
+        "demoString2": {
+          "type": "string"
+        }
+      }
+    }
+  ]
+}
