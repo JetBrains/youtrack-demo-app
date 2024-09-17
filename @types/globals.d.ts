@@ -14,11 +14,9 @@ export interface HubService {
 
 interface BaseAPILayer {
   alert: (...args: Parameters<(typeof AlertService)['addAlert']>) => void;
-  enterModalMode: () => void;
-  exitModalMode: () => void;
+  enterModalMode: Promise<() => void>;
+  exitModalMode: Promise<() => void>;
   collapse: () => void;
-  reportWidgetSize: (size: {width: number; height: number}) => void;
-  reportWidgetScroll?: (scroll: {yScrolled: boolean}) => void;
 }
 
 /*
@@ -32,35 +30,34 @@ export interface InstanceAwareAPILayer extends BaseAPILayer {
  * This layer allows plugin to communicate with own backend
  */
 export interface PluginEndpointAPILayer extends InstanceAwareAPILayer {
-  fetchApp: <T = unknown>(relativeURL: string, requestParams: RequestParams & {scope?: boolean}) => Promise<T>;
+  fetchApp: <T = unknown>(relativeURL: string, requestParams?: RequestParams & {scope?: boolean}) => Promise<T>;
 }
 
 /*
- * This layer should repeat Custom Widgets API and be compatible with it.
- * It is needed to make it possible to use custom widgets as plugins with no or minimal changes.
+ * This layer is only available for MARKDOWN and DASHBOARD_WIDGET extension points
  */
-export interface CustomWidgetAPILayer extends PluginEndpointAPILayer {
-  setTitle: (label: string, labelUrl: string) => void;
-  setLoadingAnimationEnabled: (isEnabled: boolean) => void;
+export interface EmbeddableWidgetAPI extends PluginEndpointAPILayer {
+  setTitle: (label: string, labelUrl: string) => Promise<void>;
+  setLoadingAnimationEnabled: (isEnabled: boolean) => Promise<void>;
 
-  enterConfigMode: () => void;
-  exitConfigMode: () => void;
+  enterConfigMode: () => Promise<void>;
+  exitConfigMode: () => Promise<void>;
 
-  setError: (e: Error) => void;
-  clearError: () => void;
+  setError: (e: Error) => Promise<void>;
+  clearError: () => Promise<void>;
 
-  readCache: () => Promise<unknown>;
+  readCache: <T = unknown>() => Promise<T | null>;
   storeCache: (data: unknown) => Promise<void>;
 
-  readConfig: <T = unknown>() => Promise<null | T>;
+  readConfig: <T = unknown>() => Promise<T | null>;
   storeConfig: (config: unknown) => Promise<void>;
 
   downloadFile: (serviceID: string, relativeURL: string, requestParams: unknown, fileName?: string) => Promise<void>;
-  fetchHub: (relativeURL: string, requestParams: RequestParams) => unknown;
+  fetchHub: (relativeURL: string, requestParams: RequestParams) => Promise<unknown>;
 
   loadServices: (applicationName: string) => Promise<HubService[]>;
 
-  alert: (...args: Parameters<(typeof AlertService)['addAlert']>) => void;
+  alert: (...args: Parameters<(typeof AlertService)['addAlert']>) => Promise<void>;
   removeWidget: () => void;
 }
 
@@ -73,7 +70,7 @@ type YTAppInterface = {
     id: string;
     type: 'user' | 'article' | 'ticket' | 'project' | 'app'
   };
-  register: (appApi?: AppAPI) => HostAPI | CustomWidgetAPILayer;
+  register: (appApi?: AppAPI) => Promise<HostAPI | EmbeddableWidgetAPI>;
 }
 
 declare global {

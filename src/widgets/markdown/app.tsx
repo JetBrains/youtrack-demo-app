@@ -1,5 +1,5 @@
 import React, {memo, useEffect} from 'react';
-import type {CustomWidgetAPILayer} from '../../../@types/globals';
+import type {EmbeddableWidgetAPI} from '../../../@types/globals';
 import {Configuration} from './configuration';
 import {WidgetConfiguration} from './types';
 
@@ -7,7 +7,7 @@ import {WidgetConfiguration} from './types';
 interface Props {}
 
 const AppComponent: React.FunctionComponent<Props> = () => {
-  const hostRef = React.useRef<CustomWidgetAPILayer | null>(null);
+  const hostRef = React.useRef<EmbeddableWidgetAPI | null>(null);
 
   const [isConfiguring, setIsConfiguring] = React.useState(false);
   const [config, setConfig] = React.useState<WidgetConfiguration | null>(null);
