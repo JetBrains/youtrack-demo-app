@@ -50,12 +50,12 @@
 
     {
       "key": "issue-option",
-      "name": "Demo app toolbar",
-      "indexPath": "lorem/index.html",
+      "name": "Demo App Toolbar",
+      "indexPath": "modal/index.html",
       "extensionPoint": "ISSUE_OPTIONS_MENU_ITEM",
       "expectedDimensions": {
-        "height": 1000,
-        "width": 1000
+        "height": 500,
+        "width": 800
       }
     },
     {
@@ -77,7 +77,7 @@
     {
       "key": "article-menu",
       "name": "Article toolbar",
-      "indexPath": "lorem/index.html",
+      "indexPath": "modal/index.html",
       "extensionPoint": "ARTICLE_OPTIONS_MENU_ITEM",
       "expectedDimensions": {
         "height": 400,

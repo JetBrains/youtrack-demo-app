@@ -54,6 +54,7 @@ export default defineConfig({
         userCard: resolve(__dirname, 'src/widgets/user-card/index.html'),
         quotes: resolve(__dirname, 'src/widgets/quotes/index.html'),
         lorem: resolve(__dirname, 'src/widgets/lorem/index.html'),
+        modal: resolve(__dirname, 'src/widgets/modal/index.html'),
         cats: resolve(__dirname, 'src/widgets/cats/index.html')
       }
     }
