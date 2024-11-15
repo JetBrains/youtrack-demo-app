@@ -55,7 +55,7 @@ export interface EmbeddableWidgetAPI extends PluginEndpointAPILayer {
   storeConfig: (config: unknown) => Promise<void>;
 
   downloadFile: (serviceID: string, relativeURL: string, requestParams: unknown, fileName?: string) => Promise<void>;
-  fetchHub: (relativeURL: string, requestParams: RequestParams) => Promise<unknown>;
+  fetchHub: (relativeURL: string, requestParams?: RequestParams) => Promise<unknown>;
 
   loadServices: (applicationName: string) => Promise<HubService[]>;
 
