@@ -5,6 +5,7 @@
   "$schema": "https://json.schemastore.org/youtrack-app.json",
   "version": "1.0.0",
   "icon": "demo-app-logo.svg",
+  "iconDark": "demo-app-logo-dark.svg",
   "url": "https://github.com/JetBrains/youtrack-demo-app",
   "minYouTrackVersion": "2024.3.0",
   "vendor": {
