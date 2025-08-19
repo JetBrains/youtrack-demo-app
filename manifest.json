@@ -3,7 +3,7 @@
   "title" : "YouTrack Demo App",
   "description" :  "App utilizes available extension points for demo reasons",
   "$schema": "https://json.schemastore.org/youtrack-app.json",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icon": "demo-app-logo.svg",
   "iconDark": "demo-app-logo-dark.svg",
   "url": "https://github.com/JetBrains/youtrack-demo-app",
@@ -27,6 +27,7 @@
     {
       "key": "fields-first",
       "name": "Cat of the day",
+      "guard": "({entity}) => entity.fields.State?.value === 'Open'",
       "indexPath": "cats/index.html",
       "extensionPoint": "ISSUE_FIELD_PANEL_FIRST"
     },
