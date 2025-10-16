@@ -5,7 +5,13 @@ import '@jetbrains/ring-ui-built/components/style.css';
 import {App} from './app';
 
 // Register widget in YouTrack. To learn more, see https://www.jetbrains.com/help/youtrack/devportal-apps/apps-host-api.html
-const host = await YTApp.register();
+const host = await YTApp.register({
+  // eslint-disable-next-line no-console
+  onAppLocationChange: location => {
+    const event = new CustomEvent('appLocationChange', {detail: location});
+    window.dispatchEvent(event);
+  }
+});
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
