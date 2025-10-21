@@ -19,7 +19,7 @@ const AppComponent: React.FunctionComponent<Props> = ({host}) => {
   const [location, setLocation] = React.useState<AppLocation | null>(null);
 
   React.useEffect(() => {
-    host.navigation?.getAppLocation().then(setLocation);
+    host.navigation?.getAppLocation?.().then(setLocation);
 
     host.fetchApp<{val1?: string, val2?: string}>('backend-global/demo', {query: {test: 'test'}}).
       then(persisted => {
