@@ -7,8 +7,8 @@ export interface AppLocation {
 // JT-84369 implementation
 export interface NavigationAPI {
   getAppLocation: () => Promise<AppLocation>;
-  updateAppLocation: (location: AppLocation) => Promise<void>;
-  replaceAppLocation: (location: AppLocation) => Promise<void>;
+  updateAppLocation: (location: Partial<AppLocation>) => Promise<void>;
+  replaceAppLocation: (location: Partial<AppLocation>) => Promise<void>;
 }
 
 type AppAPI = {

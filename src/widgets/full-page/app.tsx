@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-indent */
 import React, {memo, useCallback} from 'react';
 import {AppLocation, type HostAPI} from '../../../@types/globals';
 import Button from '@jetbrains/ring-ui-built/components/button/button';

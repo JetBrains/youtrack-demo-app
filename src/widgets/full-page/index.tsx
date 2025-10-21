@@ -6,7 +6,6 @@ import {App} from './app';
 
 // Register widget in YouTrack. To learn more, see https://www.jetbrains.com/help/youtrack/devportal-apps/apps-host-api.html
 const host = await YTApp.register({
-  // eslint-disable-next-line no-console
   onAppLocationChange: location => {
     const event = new CustomEvent('appLocationChange', {detail: location});
     window.dispatchEvent(event);
