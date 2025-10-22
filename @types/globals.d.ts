@@ -1,7 +1,22 @@
+export interface AppLocation {
+  pathname: string;
+  search: string;
+  hash: string;
+}
+
+// JT-84369 implementation
+export interface NavigationAPI {
+  getAppLocation: () => Promise<AppLocation>;
+  updateAppLocation: (location: Partial<AppLocation>) => Promise<void>;
+  replaceAppLocation: (location: Partial<AppLocation>) => Promise<void>;
+}
+
 type AppAPI = {
   onRefresh?: () => void;
   onConfigure?: () => void;
+  onAppLocationChange?: (location: AppLocation) => void;
 }
+
 
 import type AlertService from '@jetbrains/ring-ui-built/components/alert-service/alert-service';
 import type {RequestParams} from '@jetbrains/ring-ui-built/components/http/http';
@@ -19,6 +34,8 @@ interface BaseAPILayer {
   /** @deprecated use "closeWidget()" method instead */
   collapse: () => void;
   closeWidget: () => void;
+  /** Available only for some extension points, see documentation */
+  navigation?: NavigationAPI;
 }
 
 /*
