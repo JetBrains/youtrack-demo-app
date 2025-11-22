@@ -1,13 +1,11 @@
-import React, {memo, useEffect} from 'react';
-import type {EmbeddableWidgetAPI} from '../../../@types/globals';
-import {Configuration} from './configuration';
-import {WidgetConfiguration} from './types';
+import React, { memo, useEffect } from 'react';
+import type { EmbeddableWidgetAPI } from '../../../@types/globals';
+import { Configuration } from './configuration';
+import { WidgetConfiguration } from './types';
 
 
-interface Props {}
-
-const AppComponent: React.FunctionComponent<Props> = () => {
-  const hostRef = React.useRef<EmbeddableWidgetAPI | null>(null);
+const AppComponent: React.FC = () => {
+  const [host, setHost] = React.useState<EmbeddableWidgetAPI | null>(null);
 
   const [isConfiguring, setIsConfiguring] = React.useState(false);
   const [config, setConfig] = React.useState<WidgetConfiguration | null>(null);
@@ -15,19 +13,19 @@ const AppComponent: React.FunctionComponent<Props> = () => {
   useEffect(() => {
     async function register() {
       // Register widget in YouTrack. To learn more, see https://www.jetbrains.com/help/youtrack/devportal-apps/apps-host-api.html
-      const host = await YTApp.register({
+      const newHost = await YTApp.register({
         onConfigure: () => setIsConfiguring(true)
       });
 
-      if (!('readConfig' in host)) {
+      if (!('readConfig' in newHost)) {
         throw new Error('Wrong type of API returned: probably widget used in wrong extension point');
       }
 
-      hostRef.current = host;
+      setHost(newHost);
 
-      const configValue = await hostRef.current!.readConfig<WidgetConfiguration>();
+      const configValue = await newHost.readConfig<WidgetConfiguration>();
       if (!configValue?.someValue) {
-        hostRef.current.enterConfigMode();
+        newHost.enterConfigMode();
         setIsConfiguring(true);
       } else {
         setConfig(configValue);
@@ -41,21 +39,21 @@ const AppComponent: React.FunctionComponent<Props> = () => {
     setConfig(newConfig ?? null);
     setIsConfiguring(false);
     if (newConfig) {
-      hostRef.current?.storeConfig(newConfig);
+      host?.storeConfig(newConfig);
     }
-    hostRef.current?.exitConfigMode();
-  }, []);
+    host?.exitConfigMode();
+  }, [host]);
 
   return (
     <div className="widget">
-      {isConfiguring && hostRef.current
+      {isConfiguring && host
         ? (
           <Configuration onDone={doneConfiguring}/>
         )
         : (
           <section>
             {'Configuration = '}
-            <span style={{fontWeight: 'bold'}}>{config?.someValue}</span>
+            <span style={{ fontWeight: 'bold' }}>{config?.someValue}</span>
           </section>
         )}
 
