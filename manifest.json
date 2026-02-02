@@ -3,7 +3,7 @@
   "title" : "YouTrack Demo App",
   "description" :  "App utilizes available extension points for demo reasons",
   "$schema": "https://json.schemastore.org/youtrack-app.json",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "icon": "demo-app-logo.svg",
   "iconDark": "demo-app-logo-dark.svg",
   "url": "https://github.com/JetBrains/youtrack-demo-app",
@@ -103,10 +103,17 @@
     },
 
     {
-      "key": "project-tab",
+      "key": "project-settings",
       "name": "Configure me",
       "indexPath": "full-page/index.html",
       "extensionPoint": "PROJECT_SETTINGS"
+    },
+
+    {
+      "key": "project-tab",
+      "name": "Configure me",
+      "indexPath": "full-page/index.html",
+      "extensionPoint": "PROJECT_TAB"
     },
 
     {
