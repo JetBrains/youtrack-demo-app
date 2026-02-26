@@ -21,13 +21,14 @@
       "extensionPoint": "MAIN_MENU_ITEM",
       "description": "Main menu item",
       "iconPath": "full-page/widget-icon.svg",
+      "showHeader": false,
       "permissions": []     
     },
 
     {
       "key": "fields-first",
       "name": "Cat of the day",
-      "guard": "({entity}) => entity.fields.State?.value === 'Open'",
+      "guard": "({entity}) => entity.fields.State?.value === 'To do'",
       "indexPath": "cats/index.html",
       "extensionPoint": "ISSUE_FIELD_PANEL_FIRST"
     },
@@ -107,13 +108,6 @@
       "name": "Configure me",
       "indexPath": "full-page/index.html",
       "extensionPoint": "PROJECT_SETTINGS"
-    },
-
-    {
-      "key": "project-tab",
-      "name": "Configure me",
-      "indexPath": "full-page/index.html",
-      "extensionPoint": "PROJECT_TAB"
     },
 
     {
