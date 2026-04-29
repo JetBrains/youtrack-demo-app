@@ -111,6 +111,13 @@
     },
 
     {
+      "key": "project-tab",
+      "name": "Demo Project Overview Tab",
+      "indexPath": "full-page/index.html",
+      "extensionPoint": "PROJECT_TAB"
+    },
+
+    {
       "key": "admin-menu",
       "name": "Dedicated Admin Page",
       "indexPath": "full-page/index.html",
