@@ -9,10 +9,22 @@
   "url": "https://github.com/JetBrains/youtrack-demo-app",
   "minYouTrackVersion": "2024.3.0",
   "vendor": {
-    "name": "JetBrains s.r.o.",
+    "name": "JetBrains s.r.o. (Demo)",
     "url": "https://jetbrains.com",
     "email": "support@jetbrains.com"
   },
+  "youTrackApiAllowedEndpoints": [
+    {
+      "method": "POST",
+      "path": "users",
+      "description": "Create user from demo widgets."
+    },
+    {
+      "method": "DELETE",
+      "path": "issues",
+      "description": "Delete issues from demo widgets."
+    }
+  ],
   "widgets": [
     {
       "key": "full-page",
