@@ -9,9 +9,7 @@
   "url": "https://github.com/JetBrains/youtrack-demo-app",
   "minYouTrackVersion": "2024.3.0",
   "vendor": {
-    "name": "D33ze Nüsse",
-    "url": "https://jetbrains.com",
-    "email": "support@jetbrains.com"
+    "name": "extra-jalapeños"
   },
   "youTrackApiAllowedEndpoints": [],
   "widgets": [
