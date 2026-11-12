@@ -1,8 +1,9 @@
 import {FetchedDataPoint, ExtractedDataPoint, ChartDataPoint} from "./types.d.ts";
-import {rollup, sum, timeDay, union} from "d3";
+import {rollup, sum, timeDay, timeSunday, union} from "d3";
 import {compareContributionToRest, getEmptyMap} from "./helper.ts";
 import { contributionLabelScale} from "./colorScales.ts";
 import { contributionLabels } from "./constants.ts";
+import {timeMonday} from "d3-time";
 
 export const extractRelevantInfo = (fetchedData: FetchedDataPoint[]): ExtractedDataPoint[] => fetchedData.map(d => {
     const date = timeDay.floor(new Date(d.date));
@@ -18,6 +19,7 @@ export const evaluateFromPOV = (authorId: string,
                                 from: Date,
                                 to: Date,
                                 groupingFunction): ChartDataPoint[] => {
+
     const uniquePersons = union(extractedDataPoints.map(d => d.authorId))
     const minutesByTimeframe = rollup(extractedDataPoints,
         D => {
@@ -26,12 +28,12 @@ export const evaluateFromPOV = (authorId: string,
                 uniquePersons: uniquePersons.size
             }
         },
-        groupingFunction
+        d => groupingFunction(new Date(d.date))
     );
 
     const minutesByTimeframeAndPersonId = rollup(extractedDataPoints,
         D => sum(D, d => d.minutes),
-        groupingFunction,
+        d => groupingFunction(new Date(d.date)),
         d => d.authorId
     );
 

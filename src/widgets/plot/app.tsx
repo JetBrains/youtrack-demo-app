@@ -24,6 +24,7 @@ import CategoryFilterTable from './components/CategoryFilterTable.tsx';
 import { fetchWorkItems } from './utils/fetching.ts';
 import DatePicker from '@jetbrains/ring-ui-built/components/date-picker/date-picker.js';
 import ChartConfiguration from "./components/Configuration.tsx";
+import {groupingFunction} from "./utils/constants.ts";
 
 const AppComponent = () => {
     const [containerWidth, setContainerWidth] = useState(0);
@@ -78,7 +79,6 @@ const AppComponent = () => {
             return
         };
         const { from, to } = timeframe;
-        const groupingFunction = (d: ExtractedDataPoint) => timeDay(d.date)
         const povData = evaluateFromPOV(selectedPerson, extractedDataPoints, from, to, groupingFunction);
         setChartData([...povData]);
     }, [extractedDataPoints, selectedPerson]);
@@ -189,6 +189,7 @@ const AppComponent = () => {
             />}
             {isConfiguring === false && <TimePlot
                 data={ChartData}
+                timeframe={timeframe}
                 width={containerWidth}
                 height={containerHeight}
                 activeCategories={activeCategories}

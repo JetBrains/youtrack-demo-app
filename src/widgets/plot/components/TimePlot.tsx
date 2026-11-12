@@ -1,6 +1,6 @@
 // we only feed raw data into the component.
 import { useRef, useEffect } from "react";
-import { ChartDataPoint } from "../utils/types.d.ts";
+import {ChartDataPoint, ExtractedDataPoint} from "../utils/types.d.ts";
 
 import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
@@ -10,9 +10,9 @@ import { scaleBand, scaleLinear } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
 import { timeDay, timeMonday } from "d3-time";
 import "d3-transition";
-import { easeBounce, easeBounceIn, easeElastic } from "d3";
+import {easeBounce, easeBounceIn, easeElastic, map} from "d3";
 import { describeDataPoint } from "../utils/helper.ts";
-import { margins } from "../utils/constants.ts";
+import { margins, groupingFunction } from "../utils/constants.ts";
 
 const TRANSITION_MS = 500;
 const MIN_TICK_SPACING_PX = 48;
@@ -23,11 +23,13 @@ const formatWeekTick = (ms: number) =>
 
 const TimePlot = ({
   data,
+  timeframe,
   width,
   height,
   activeCategories,
 }: {
   data: ChartDataPoint[];
+  timeframe: {from: Date, to: Date};
   width: number;
   height: number;
   activeCategories: Set<string>;
@@ -65,10 +67,10 @@ const TimePlot = ({
     // x: one band per day from the first day with data until now
     const minDate = data[0].date;
     const days: Date[] = timeDay
-      .range(timeDay.floor(minDate), new Date());
+      .range(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to));
 
     const xScale = scaleBand<number>()
-      .domain(days)
+      .domain(map(days, groupingFunction))
       .range([0, canvasWidth])
       .padding(0.2);
 
