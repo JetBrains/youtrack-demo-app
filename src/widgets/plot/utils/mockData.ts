@@ -27,6 +27,7 @@ const createAuthor = (name: string): author => ({
     login: name.toLowerCase().trim(),
 });
 
+
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /**

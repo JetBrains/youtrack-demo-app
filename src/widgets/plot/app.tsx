@@ -23,6 +23,7 @@ import TimePlot from './components/TimePlot.tsx';
 import CategoryFilterTable from './components/CategoryFilterTable.tsx';
 import { fetchWorkItems } from './utils/fetching.ts';
 import DatePicker from '@jetbrains/ring-ui-built/components/date-picker/date-picker.js';
+import ChartConfiguration from "./components/Configuration.tsx";
 
 const AppComponent = () => {
     const [containerWidth, setContainerWidth] = useState(0);
@@ -32,7 +33,7 @@ const AppComponent = () => {
     const [isConfiguring, setIsConfiguring] = useState(false);
     
     const [timeframe, setTimeframe] = useState<{ from: Date, to: Date }>({ 
-        from: sub(new Date(), { months: 6 }),
+        from: sub(new Date(), { months: 3 }),
         to: new Date()
     })
 
@@ -55,8 +56,9 @@ const AppComponent = () => {
 
     const loadData = async () => {
         const { from, to } = timeframe;
-        const fetchedData: FetchedDataPoint[] = await fetchWorkItems(from, to, "Subtask of: TODO-380");
-    
+
+        const fetchedData: FetchedDataPoint[] = await fetchWorkItems(null, from, to, "Subtask of: TODO-380");
+
         const authors = extractAllPeople(fetchedData);
         setAuthors(authors);
 
@@ -166,6 +168,13 @@ const AppComponent = () => {
                 range
                 to={timeframe.to}
             />
+
+          <Button
+              onClick={() => setIsConfiguring(!isConfiguring)}
+              active={isConfiguring}
+          >
+              Configuration
+          </Button>
           </ButtonToolbar>
         </section>
         <section
@@ -173,15 +182,17 @@ const AppComponent = () => {
             className="component"
             ref={plotRef}
         >
-          <TimePlot
-            data={ChartData}
-            width={containerWidth}
-            height={containerHeight}
-            activeCategories={activeCategories}
-          />
-        </section>
-        <section id="summary">
-          <p>On average, you contribute</p>
+            {isConfiguring && <ChartConfiguration
+                host={null}
+                initalQuery={"has: work"}
+                onDone={(payload) => console.log(payload)}
+            />}
+            {isConfiguring === false && <TimePlot
+                data={ChartData}
+                width={containerWidth}
+                height={containerHeight}
+                activeCategories={activeCategories}
+            />}
         </section>
       </>
     )

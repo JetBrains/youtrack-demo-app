@@ -9,9 +9,9 @@ import ButtonSet from '@jetbrains/ring-ui-built/components/button-set/button-set
 import Text from '@jetbrains/ring-ui-built/components/text/text';
 import {HostAPI} from "../../../../@types/globals";
 
-const ChartConfiguration = ({ host, onDone }: { host: HostAPI }) => {
-    const [query, setQuery] = useState("")
-    const ASSIST_FIELDS = "caret,query,suggestions(caret,completionEnd,completionStart,description,group,matchingEnd,matchingStart,option)""
+const ChartConfiguration = ({ host, initalQuery, onDone }: { host: HostAPI, initialQuery: string }) => {
+    const [query, setQuery] = useState(initalQuery)
+    const ASSIST_FIELDS = "caret,query,suggestions(caret,completionEnd,completionStart,description,group,matchingEnd,matchingStart,option)"
 
     const dataSource = useCallback(
         ({query: q, caret}: QueryAssistRequestParams): Promise<QueryAssistResponse> =>
@@ -32,22 +32,22 @@ const ChartConfiguration = ({ host, onDone }: { host: HostAPI }) => {
     }, [onDone, query]);
 
     return (
-        <form className="ring-form" onSubmit={e => e.preventDefault()}>
-            <Text>Search query for the issues whose work items are analyzed:</Text>
-            <QueryAssist
-                query={"has: work"}
-                placeholder="Enter query to filter for specific items"
-                dataSource={dataSource}
-                onChange={onChange}
-                onApply={onChange}
-                focus
-                clear
-            />
-            <ButtonSet className="config-buttons">
-                <Button primary onClick={onSave}>Save</Button>
-                <Button onClick={() => onDone()}>Cancel</Button>
-            </ButtonSet>
-        </form>
+      <form className="ring-form" onSubmit={e => e.preventDefault()}>
+        <Text>Search query for the issues whose work items are analyzed:</Text>
+        <QueryAssist
+          query={initalQuery}
+          placeholder="Enter query to filter for specific items"
+          dataSource={() => "rest"}
+          onChange={onChange}
+          onApply={onSave}
+          focus
+          clear
+        />
+        <ButtonSet className="config-buttons">
+          <Button primary onClick={onSave}>Save</Button>
+          <Button onClick={() => onDone()}>Cancel</Button>
+        </ButtonSet>
+      </form>
     );
 
 }

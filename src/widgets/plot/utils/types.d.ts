@@ -36,3 +36,7 @@ export type ChartConfig = {
     height: number,
     mode: "day" | "week"
 }
+
+export interface WidgetConfiguration {
+    query: string;
+}
