@@ -12,20 +12,29 @@ export const changeOpacity = (colorString: string, opacity: number): string => {
     }
     return color(colorString)!.copy({ opacity }).formatHex8()
 }
+const labels = contributionLabels.en;
+const n = labels.length;
 
-export const colorScaleContributionCategorical = scaleThreshold().domain(
-    contributionLabels.en.map((_, i) => i / contributionLabels.en.length)
-).range(
-    [...contributionLabels.en.map((_, i) => colorScaleContributionLinear(i/ contributionLabels.en.length / 0.8))]
-)
+export const colorScaleContributionCategorical = scaleThreshold<number, string>()
+    .domain(Array.from({ length: Math.max(0, n - 1) }, (_, i) => (i + 1) / n))
+    .range(
+        labels.map((_, i) =>
+            colorScaleContributionLinear(n === 1 ? 0 : i / (n - 1))
+        )
+);
 
 const constructContributionLabelScale = (labels: string[]) => {
     // without borders
     const bandCount = labels.length;
-    const thresholds: number[] = Array(bandCount+1).fill(0).map((_, idx) => (idx / bandCount) * (.98) + 0.01);
-    return scaleThreshold([...thresholds], labels);
-}
+    const thresholds = Array.from(
+        { length: bandCount - 1 },
+        (_, idx) => (idx + 1) / bandCount
+    );
 
+    return scaleThreshold<number, string>()
+        .domain(thresholds)
+        .range(labels);
+}
 export const contributionLabelScale = constructContributionLabelScale(contributionLabels.en)
 
 const constructContributionCategoryColour = (labels: string[]) => {

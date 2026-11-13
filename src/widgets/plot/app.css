@@ -44,8 +44,9 @@ g.axes  text {
   font-size: var(--ring-font-size-smaller);
 }
 
-svg.canvas rect.total-minutes {
-  stroke-width: 20;
+g.canvas rect.total-minutes {
+  fill: currentColor;
+  opacity: 0.05;
 }
 
 g.grid line {

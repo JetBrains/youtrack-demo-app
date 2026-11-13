@@ -12,6 +12,19 @@ import {
 import {ChartDataPoint} from "./types.d.ts";
 import {formatDuration} from "date-fns/formatDuration";
 import {contributionLabelScale} from "./colorScales.ts";
+import type {HostAPI} from "../../../../@types/globals";
+
+// Resolves the YouTrack host, or null when running outside YouTrack (plain dev server)
+export const getHost = async (): Promise<HostAPI | null> => {
+    if (typeof YTApp === "undefined") {
+        return null;
+    }
+    try {
+        return await YTApp.register();
+    } catch {
+        return null;
+    }
+}
 
 
 export const margin = {
@@ -30,6 +43,7 @@ export const describeDataPoint = (d: ChartDataPoint) => {
     if (d.totalMinutes === 0) {
         return `${dateString}\nno work done by anybody`
     }
+    console.log(contributionLabelScale(d.contribution), d.contribution)
     return (
         `${dateString}\n\n` +
         `Contributed ${contributionLabelScale(d.contribution)} in comparison to all members.\n` +

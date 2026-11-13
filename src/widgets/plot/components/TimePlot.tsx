@@ -10,7 +10,7 @@ import { scaleBand, scaleLinear } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
 import { timeDay, timeMonday } from "d3-time";
 import "d3-transition";
-import {easeBounce, easeBounceIn, easeElastic, map} from "d3";
+import {easeBounce, easeBounceIn, easeElastic, every, map} from "d3";
 import { describeDataPoint } from "../utils/helper.ts";
 import { margins, groupingFunction } from "../utils/constants.ts";
 

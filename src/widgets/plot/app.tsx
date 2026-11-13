@@ -25,6 +25,7 @@ import { fetchWorkItems } from './utils/fetching.ts';
 import DatePicker from '@jetbrains/ring-ui-built/components/date-picker/date-picker.js';
 import ChartConfiguration from "./components/Configuration.tsx";
 import {groupingFunction} from "./utils/constants.ts";
+import {getHost} from "./utils/helper.ts";
 
 const AppComponent = () => {
     const [containerWidth, setContainerWidth] = useState(0);
@@ -56,9 +57,10 @@ const AppComponent = () => {
     const categorySummary = useMemo(() => getCategorySummary(ChartData), [ChartData]);
 
     const loadData = async () => {
+        const host = await getHost()
         const { from, to } = timeframe;
 
-        const fetchedData: FetchedDataPoint[] = await fetchWorkItems(null, from, to, "Subtask of: TODO-380");
+        const fetchedData: FetchedDataPoint[] = await fetchWorkItems(host, from, to, "Subtask of: TODO-380");
 
         const authors = extractAllPeople(fetchedData);
         setAuthors(authors);
@@ -154,11 +156,11 @@ const AppComponent = () => {
                         })}
             </ButtonGroup>
             
-            <Button
-                onClick={() => loadData()}
-            >
-                Refresh Data
-            </Button>
+            {/*<Button*/}
+            {/*    onClick={() => loadData()}*/}
+            {/*>*/}
+            {/*    Refresh Data*/}
+            {/*</Button>*/}
 
             <DatePicker
                 clear
