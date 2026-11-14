@@ -1,9 +1,9 @@
 import {FetchedDataPoint, ExtractedDataPoint, ChartDataPoint} from "./types.d.ts";
-import {rollup, sum, timeDay, timeSunday, union} from "d3";
-import {compareContributionToRest, getEmptyMap} from "./helper.ts";
-import { contributionLabelScale} from "./colorScales.ts";
-import { contributionLabels } from "./constants.ts";
-import {timeMonday} from "d3-time";
+import {timeDay} from "d3-time";
+import {rollup, sum, union} from "d3-array";
+import {compareContributionToRest} from "./helper.ts";
+import {contributionLabelScale} from "./colorScales.ts";
+import {contributionLabels} from "./constants.ts";
 
 export const extractRelevantInfo = (fetchedData: FetchedDataPoint[]): ExtractedDataPoint[] => fetchedData.map(d => {
     const date = timeDay.floor(new Date(d.date));
@@ -18,7 +18,7 @@ export const evaluateFromPOV = (authorId: string,
                                 extractedDataPoints: ExtractedDataPoint[],
                                 from: Date,
                                 to: Date,
-                                groupingFunction): ChartDataPoint[] => {
+                                groupingFunction: (d: Date) => Date): ChartDataPoint[] => {
 
     const uniquePersons = union(extractedDataPoints.map(d => d.authorId))
     const minutesByTimeframe = rollup(extractedDataPoints,
@@ -37,7 +37,7 @@ export const evaluateFromPOV = (authorId: string,
         d => d.authorId
     );
 
-    const allDays = getEmptyMap(from, to)
+    const allDays = minutesByTimeframe.keys();
     const fillDates = allDays.map(date => {
         const dateToCheck = date;
         const somebodyDidSomething = minutesByTimeframe.has(dateToCheck);
@@ -52,7 +52,7 @@ export const evaluateFromPOV = (authorId: string,
                 contributionCategory: contributionLabelScale(0.5)
             }
         }
-        const { totalMinutes } = minutesByTimeframe.get(dateToCheck)!;
+        const {totalMinutes} = minutesByTimeframe.get(dateToCheck)!;
         const ownContribution: number = minutesByTimeframeAndPersonId.get(dateToCheck)!.get(authorId) || 0;
         const avgMinutes = (totalMinutes - ownContribution) / (uniquePersons.size - 1);
         const contribution = compareContributionToRest([ownContribution, avgMinutes])

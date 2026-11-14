@@ -17,15 +17,22 @@ import {
 } from "./utils/processingData.ts";
 import ButtonGroup from "@jetbrains/ring-ui-built/components/button-group/button-group";
 import Button from "@jetbrains/ring-ui-built/components/button/button";
-import {author, ExtractedDataPoint, ChartDataPoint, FetchedDataPoint } from "./utils/types.d.ts";
+import {
+    author,
+    ExtractedDataPoint,
+    ChartDataPoint,
+    FetchedDataPoint,
+} from "./utils/types.d.ts";
+
 import ButtonToolbar from "@jetbrains/ring-ui-built/components/button-toolbar/button-toolbar";
 import TimePlot from './components/TimePlot.tsx';
 import CategoryFilterTable from './components/CategoryFilterTable.tsx';
 import { fetchWorkItems } from './utils/fetching.ts';
 import DatePicker from '@jetbrains/ring-ui-built/components/date-picker/date-picker.js';
 import ChartConfiguration from "./components/Configuration.tsx";
-import {groupingFunction} from "./utils/constants.ts";
 import {getHost} from "./utils/helper.ts";
+import {AggregationConfiguration} from "./utils/classes.ts";
+import {timeFormat} from "d3";
 
 const AppComponent = () => {
     const [containerWidth, setContainerWidth] = useState(0);
@@ -33,15 +40,28 @@ const AppComponent = () => {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [isConfiguring, setIsConfiguring] = useState(false);
-    
+
+    const timeAggregationOptions: AggregationConfiguration = new AggregationConfiguration([
+        ["days", {
+            agg: timeDay,
+            // show the month only on the 1st of a month, otherwise just the day
+            tickValueFormat: (date: Date) => date.getDate() === 1
+                ? timeFormat("%d")(date)
+                : timeFormat("%d.")(date)
+        }],
+        ["weeks", { agg: timeMonday, tickValueFormat: timeFormat("cw %V")}, ],
+        ["months", { agg: timeMonth, tickValueFormat: timeFormat("%B") }]
+    ])
+
     const [timeframe, setTimeframe] = useState<{ from: Date, to: Date }>({ 
-        from: sub(new Date(), { months: 3 }),
+        from: sub(new Date(), { months: 2, weeks: 2 }),
         to: new Date()
     })
 
     const [extractedDataPoints, setExtractedDataPoints] = useState<ExtractedDataPoint[]>([]);
     const [authors, setAuthors] = useState<author[]>([]);
     const [selectedPerson, setSelectedPerson] = useState<string>("");
+    const [aggregationLabel, setaggregationLabel] = useState<string>("weeks")
     
     const [ChartData, setChartData] = useState<ChartDataPoint[]>([])
     const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set());
@@ -81,26 +101,14 @@ const AppComponent = () => {
             return
         };
         const { from, to } = timeframe;
-        const povData = evaluateFromPOV(selectedPerson, extractedDataPoints, from, to, groupingFunction);
+        const povData = evaluateFromPOV(selectedPerson, extractedDataPoints, from, to, timeAggregationOptions.get(aggregationLabel).agg!);
         setChartData([...povData]);
-    }, [extractedDataPoints, selectedPerson]);
+    }, [extractedDataPoints, aggregationLabel, selectedPerson]);
 
     // whenever the data changes (person, dates, grouping), all present categories start active
     useEffect(() => {
         setActiveCategories(new Set(presentCategories));
     }, [presentCategories]);
-
-    const toggleCategory = (category: string) => {
-        setActiveCategories(prev => {
-            const next = new Set(prev);
-            if (next.has(category)) {
-                next.delete(category);
-            } else {
-                next.add(category);
-            }
-            return next;
-        });
-    };
 
     useEffect(() => {
         if (!plotRef.current) {
@@ -144,16 +152,16 @@ const AppComponent = () => {
           <ButtonToolbar>
             <ButtonGroup>
               {authors.map(author => {
-                            return (
-                              <Button
-                                key={author.id}
-                                active={author.id === selectedPerson}
-                                onClick={() => setSelectedPerson(author.id)}
-                              >
-                                {author.name}
-                              </Button>
-                            )
-                        })}
+                return (
+                      <Button
+                        key={author.id}
+                        active={author.id === selectedPerson}
+                        onClick={() => setSelectedPerson(author.id)}
+                      >
+                        {author.name}
+                      </Button>
+                    )
+                })}
             </ButtonGroup>
             
             {/*<Button*/}
@@ -170,6 +178,23 @@ const AppComponent = () => {
                 range
                 to={timeframe.to}
             />
+
+          <ButtonGroup>
+              {
+                  Array.from(timeAggregationOptions.keys()).map((label) => {
+                      return(
+                          <Button
+                              key={label}
+                              value={label}
+                              onClick={() => setaggregationLabel(label)}
+                              active={aggregationLabel === label}
+                          >
+                              {label}
+                          </Button>
+                      )
+                  })
+              }
+          </ButtonGroup>
 
           <Button
               onClick={() => setIsConfiguring(!isConfiguring)}
@@ -192,9 +217,9 @@ const AppComponent = () => {
             {isConfiguring === false && <TimePlot
                 data={ChartData}
                 timeframe={timeframe}
+                timeAggregation={timeAggregationOptions.get(aggregationLabel)}
                 width={containerWidth}
                 height={containerHeight}
-                activeCategories={activeCategories}
             />}
         </section>
       </>

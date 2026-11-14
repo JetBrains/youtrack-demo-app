@@ -46,7 +46,7 @@ g.axes  text {
 
 g.canvas rect.total-minutes {
   fill: currentColor;
-  opacity: 0.05;
+  opacity: .1;
 }
 
 g.grid line {

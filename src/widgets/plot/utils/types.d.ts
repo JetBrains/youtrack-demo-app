@@ -1,3 +1,5 @@
+import {TimeInterval} from "d3";
+
 export type author = {
     id: string;
     login: string;

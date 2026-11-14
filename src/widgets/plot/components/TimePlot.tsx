@@ -8,11 +8,12 @@ import { max, union } from "d3-array";
 import { select } from "d3-selection";
 import { scaleBand, scaleLinear } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
-import { timeDay, timeMonday } from "d3-time";
+import { timeDay } from "d3-time";
 import "d3-transition";
-import {easeBounce, easeBounceIn, easeElastic, every, map} from "d3";
-import { describeDataPoint } from "../utils/helper.ts";
-import { margins, groupingFunction } from "../utils/constants.ts";
+import {easeBounce, easeBounceIn, easeElastic, every, map, timeDays} from "d3";
+import {describeDataPoint, getEmptyMap} from "../utils/helper.ts";
+import { margins } from "../utils/constants.ts";
+import {AggregationValue} from "../utils/classes.ts";
 
 const TRANSITION_MS = 500;
 const MIN_TICK_SPACING_PX = 48;
@@ -26,13 +27,13 @@ const TimePlot = ({
   timeframe,
   width,
   height,
-  activeCategories,
+  timeAggregation
 }: {
   data: ChartDataPoint[];
   timeframe: {from: Date, to: Date};
   width: number;
   height: number;
-  activeCategories: Set<string>;
+  timeAggregation: AggregationValue;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const previousDataRef = useRef<ChartDataPoint[] | null>(null);
@@ -56,9 +57,8 @@ const TimePlot = ({
     // animate only when the data or category toggles changed (and it is not the first paint);
     // resizes must update instantly, otherwise every resize tick restarts all transitions
     const dataChanged = previousDataRef.current !== null && previousDataRef.current !== data;
-    const categoriesChanged = previousActiveRef.current !== null && previousActiveRef.current !== activeCategories;
+    const categoriesChanged = previousActiveRef.current !== null;
     previousDataRef.current = data;
-    previousActiveRef.current = activeCategories;
 
     const duration = dataChanged || categoriesChanged ? TRANSITION_MS : 0;
 
@@ -66,11 +66,10 @@ const TimePlot = ({
 
     // x: one band per day from the first day with data until now
     const minDate = data[0].date;
-    const days: Date[] = timeDay
-      .range(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to));
+    const days: Date[] = timeDays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to));
 
     const xScale = scaleBand<number>()
-      .domain(map(days, groupingFunction))
+      .domain(map(days, timeAggregation.agg))
       .range([0, canvasWidth])
       .padding(0.2);
 
@@ -79,7 +78,7 @@ const TimePlot = ({
       .range([canvasHeight, 0])
       .nice();
 
-    const tickValues: Set<Date> = union(days.map((d: Date) => timeMonday(d)))
+    const tickValues: Set<Date> = union(map(days, timeAggregation.agg));
     svg
       .select<SVGGElement>(".x.axis")
       .transition()
@@ -87,7 +86,7 @@ const TimePlot = ({
       .call(
         axisBottom(xScale)
           .tickValues(tickValues.values())
-          .tickFormat((d) => formatWeekTick(+d)),
+          .tickFormat((d) => timeAggregation.tickValueFormat(d)),
       );
 
     svg
@@ -98,6 +97,7 @@ const TimePlot = ({
 
     const canvas = svg.select(".canvas");
 
+    console.log(data.length, data[0])
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     canvas
       .selectAll<SVGRectElement, ChartDataPoint[]>("rect.total-minutes")
@@ -131,6 +131,7 @@ const TimePlot = ({
       .attr("width", xScale.bandwidth())
       .attr("y", (d) => yScale(d.totalMinutes))
       .attr("height", (d) => canvasHeight - yScale(d.totalMinutes));
+      // .attr("fill", (d) => colorScaleContributionCategorical(1 - d.contribution));
 
     canvas
       .selectAll<SVGRectElement, ChartDataPoint>("rect.own-contribution")
@@ -140,6 +141,7 @@ const TimePlot = ({
             const rects = enter
                 .append("rect")
                 .attr("class", "own-contribution")
+                .attr("data-date", (d) => d.date)
                 .attr("x", (d) => xScale(d.date.getTime()) ?? 0)
                 .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
@@ -148,16 +150,15 @@ const TimePlot = ({
             return rects;
         },
         (update) => {
-          console.log(update)
           return update
         },
         (exit) =>
             exit
                 .transition()
                 .duration(duration)
-                .transition()
-                .delay(200)
-                .remove(),
+                .attr("y", canvasHeight)
+                .attr("height", 0)
+                .remove()
       )
       .attr("data-value", (d) => d.contribution)
       .call((rects) =>
@@ -172,13 +173,9 @@ const TimePlot = ({
       .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
       .transition()
       .duration(duration)
-      .attr("y", (d) => (activeCategories.has(d.contributionCategory) ? yScale(d.minutes) : canvasHeight))
-      .attr("opacity", (d) => activeCategories.has(d.contributionCategory))
-      .attr("height", (d) =>
-        activeCategories.has(d.contributionCategory) ? yScale(0) - yScale(d.minutes) : 0,
-      )
-      ;
-  }, [data, activeCategories, viewBoxWidth, viewBoxHeight]);
+      .attr("y", (d) => yScale(d.minutes))
+      .attr("height", (d) => yScale(0) - yScale(d.minutes));
+  }, [data, viewBoxWidth, viewBoxHeight]);
 
   const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
 

@@ -43,7 +43,7 @@ export const describeDataPoint = (d: ChartDataPoint) => {
     if (d.totalMinutes === 0) {
         return `${dateString}\nno work done by anybody`
     }
-    console.log(contributionLabelScale(d.contribution), d.contribution)
+
     return (
         `${dateString}\n\n` +
         `Contributed ${contributionLabelScale(d.contribution)} in comparison to all members.\n` +
@@ -51,7 +51,7 @@ export const describeDataPoint = (d: ChartDataPoint) => {
     )
 }
 
-export const getEmptyMap = (from: Date, to: Date) => timeDays(timeMonday.floor(from), timeDay.ceil(to))
+export const getEmptyMap = (from: Date, to: Date) => timeDays(timeDay.floor(from), timeDay.ceil(to))
 
 export const calculateAverageOtherContribution = (
     minutesByPerson: InternMap<string, number>,
