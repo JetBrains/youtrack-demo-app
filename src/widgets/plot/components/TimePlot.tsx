@@ -11,9 +11,10 @@ import { axisLeft, axisBottom } from "d3-axis";
 import { timeDay } from "d3-time";
 import "d3-transition";
 import {easeBounce, easeBounceIn, easeElastic, every, map, timeDays} from "d3";
-import {describeDataPoint, getEmptyMap} from "../utils/helper.ts";
+import {describeDataPoint, getEmptyMap, toHoursAndMinutes} from "../utils/helper.ts";
 import { margins } from "../utils/constants.ts";
 import {AggregationValue} from "../utils/classes.ts";
+import {formatDuration} from "date-fns/formatDuration";
 
 const TRANSITION_MS = 500;
 const MIN_TICK_SPACING_PX = 48;
@@ -89,11 +90,20 @@ const TimePlot = ({
           .tickFormat((d) => timeAggregation.tickValueFormat(d)),
       );
 
+    const tickValueFormatting = (totalMinutes) => {
+      const { hours, minutes } = toHoursAndMinutes(totalMinutes);
+      if (hours <= 0) {
+        return `${minutes}m`;
+      }
+      return `${hours}h ${minutes}m`
+    }
     svg
       .select<SVGGElement>(".y.axis")
       .transition()
       .duration(duration)
-      .call(axisLeft(yScale));
+      .call(axisLeft(yScale)
+          .tickFormat((d: number) => tickValueFormatting(d))
+      );
 
     const canvas = svg.select(".canvas");
 

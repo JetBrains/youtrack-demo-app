@@ -14,7 +14,7 @@ export const contributionLabels = {
     ]
 }
 
-export const margins = { top: 20, right: 20, bottom: 30, left: 40 };
+export const margins = { top: 10, right: 20, bottom: 30, left: 60 };
 
 // Used only in dev preview (no YouTrack host) to generate fake worklogs
 export const MOCK_AUTHORS = ["Alice", "Bob", "Carol"];

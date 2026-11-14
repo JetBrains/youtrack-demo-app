@@ -38,6 +38,11 @@ export const getMondays = (from: Date, to: Date) => {
     return union([timeMonday.floor(from), ...timeMondays(from, to, 1), timeDay.floor(to)])
 }
 
+export const toHoursAndMinutes = (totalMinutes: number) => ({
+    hours: Math.floor(totalMinutes / 60),
+    minutes: totalMinutes % 60,
+});
+
 export const describeDataPoint = (d: ChartDataPoint) => {
     const dateString = `${d.date.toLocaleDateString([], { day: "numeric", month: "short", year: "numeric", weekday: "short" })}`
     if (d.totalMinutes === 0) {
@@ -47,7 +52,7 @@ export const describeDataPoint = (d: ChartDataPoint) => {
     return (
         `${dateString}\n\n` +
         `Contributed ${contributionLabelScale(d.contribution)} in comparison to all members.\n` +
-        `${formatDuration({ minutes: d.minutes }, { zero: true })} out of ${formatDuration({ minutes: d.totalMinutes}, { zero: true })} (${(d.contribution * 100).toFixed(0)}%)`
+        `${formatDuration(toHoursAndMinutes(d.minutes), { zero: false })} out of ${formatDuration(toHoursAndMinutes(d.totalMinutes), { zero: false })} (${(d.contribution * 100).toFixed(0)}%)`
     )
 }
 

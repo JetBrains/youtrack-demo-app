@@ -47,14 +47,14 @@ const AppComponent = () => {
             // show the month only on the 1st of a month, otherwise just the day
             tickValueFormat: (date: Date) => date.getDate() === 1
                 ? timeFormat("%d")(date)
-                : timeFormat("%d.")(date)
+                : timeFormat("%d")(date)
         }],
         ["weeks", { agg: timeMonday, tickValueFormat: timeFormat("cw %V")}, ],
         ["months", { agg: timeMonth, tickValueFormat: timeFormat("%B") }]
     ])
 
     const [timeframe, setTimeframe] = useState<{ from: Date, to: Date }>({ 
-        from: sub(new Date(), { months: 2, weeks: 2 }),
+        from: sub(new Date(), { months: 3 }),
         to: new Date()
     })
 
