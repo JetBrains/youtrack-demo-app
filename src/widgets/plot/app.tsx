@@ -162,13 +162,13 @@ const AppComponent = () => {
       return;
     }
     const { from, to } = timeframe;
-    const groupingFunction = (d: ExtractedDataPoint) => timeDay(d.date);
+    const groupingFunction = timeDay;
     const povData = evaluateFromPOV(
       selectedPerson,
       extractedDataPoints,
       from,
       to,
-      groupingFunction,
+        groupingFunction
     );
     setChartData([...povData]);
   }, [extractedDataPoints, selectedPerson]);

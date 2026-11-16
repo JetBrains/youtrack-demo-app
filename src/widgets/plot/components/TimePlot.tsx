@@ -79,10 +79,6 @@ const TimePlot = ({
       .range([0, contentWidth])
       .padding(0.2);
 
-    const xScaleTime = scaleTime()
-      .domain(days)
-      .range([0, contentWidth]);
-
     const yScale = scaleLinear()
       .domain([0, max(data, (d) => d.totalMinutes) as number])
       .range([canvasHeight, 0])
@@ -95,6 +91,7 @@ const TimePlot = ({
       .duration(duration)
       .call(
         axisBottom(xScale)
+            .tickValues(tickValues)
           .tickFormat(d => new Date(d).toLocaleDateString([], { "weekday": "short" }))
       );
 
@@ -145,6 +142,7 @@ const TimePlot = ({
       .data(data, d => d.date)
       .join(
         (enter) => {
+            console.log(data)
             const rects = enter
                 .append("rect")
                 .attr("class", "own-contribution")
