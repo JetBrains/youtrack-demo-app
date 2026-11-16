@@ -33,6 +33,7 @@ import {
 } from "./utils/types.d.ts";
 import ButtonToolbar from "@jetbrains/ring-ui-built/components/button-toolbar/button-toolbar";
 import TimePlot from "./components/TimePlot.tsx";
+import ScrollableBarChart from "./components/ScrollableBarChart.tsx";
 import CategoryFilterTable from "./components/CategoryFilterTable.tsx";
 import { useResizeObserver } from "./hooks/useResizeObserver.ts";
 import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-picker.js";
@@ -226,8 +227,15 @@ const AppComponent = () => {
             height={containerHeight}
           />
         )} */}
-        {isResizing === false && (
+        {/* {isResizing === false && viewMode === "heatmap" && (
           <TimePlot
+            data={ChartData}
+            width={containerWidth}
+            height={containerHeight}
+          />
+        )} */}
+        {(
+          <ScrollableBarChart
             data={ChartData}
             width={containerWidth}
             height={containerHeight}

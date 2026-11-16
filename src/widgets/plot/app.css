@@ -98,6 +98,34 @@ path {
   stroke: none;
 }
 
+/* scrollable hours-per-day chart: pinned y-axis + horizontally scrolling bars */
+.scrollable-bar-chart {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.scrollable-bar-chart .pinned-axis {
+  flex: none;
+  overflow: visible;
+}
+
+.scrollable-bar-chart .scroll-area {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.scrollable-bar-chart .scroll-area svg {
+  display: block;
+}
+
+.scrollable-bar-chart .axis path.domain {
+  stroke: currentColor;
+  stroke-opacity: 0.4;
+}
+
 .category-list {
   display: grid;
   gap: calc(var(--ring-unit) * 2);
