@@ -22,12 +22,13 @@ export const colorScaleContributionCategorical = scaleThreshold().domain(
 const constructContributionLabelScale = (labels: string[]) => {
     // without borders
     const bandCount = labels.length;
-    const thresholds: number[] = Array(bandCount+1).fill(0).map((_, idx) => (idx / bandCount) * (.98) + 0.01);
-    return scaleThreshold([...thresholds], labels);
+    const thresholds: number[] = Array(bandCount).fill(0).map((_, idx) => (idx / bandCount));
+    return scaleThreshold(thresholds, labels);
 }
 
-export const contributionLabelScale = constructContributionLabelScale(contributionLabels.en)
 
+export const contributionLabelScale = constructContributionLabelScale(contributionLabels.en)
+console.log(contributionLabelScale(0.9))
 const constructContributionCategoryColour = (labels: string[]) => {
     const colors: string[] = labels.map((_, i) => colorScaleContributionLinear(i / (labels.length - 1)));
     const pairs = zip(labels, colors) as [string, string][]

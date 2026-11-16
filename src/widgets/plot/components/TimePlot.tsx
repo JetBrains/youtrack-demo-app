@@ -4,9 +4,9 @@ import { ChartDataPoint } from "../utils/types.d.ts";
 
 import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
-import { max, union } from "d3-array";
+import { every, max, union } from "d3-array";
 import { select } from "d3-selection";
-import { scaleBand, scaleLinear } from "d3-scale";
+import { scaleBand, scaleLinear, scaleTime } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
 import { timeDay, timeMonday } from "d3-time";
 import "d3-transition";
@@ -16,7 +16,7 @@ import { margins } from "../utils/constants.ts";
 
 const TRANSITION_MS = 500;
 const MIN_TICK_SPACING_PX = 48;
-const MIN_STEP_WIDTH = 10;
+const MIN_STEP_WIDTH = 25;
 
 const formatWeekTick = (ms: number) =>
   new Date(ms).toLocaleDateString([], { day: "2-digit", month: "short" });
@@ -79,6 +79,10 @@ const TimePlot = ({
       .range([0, contentWidth])
       .padding(0.2);
 
+    const xScaleTime = scaleTime()
+      .domain(days)
+      .range([0, contentWidth]);
+
     const yScale = scaleLinear()
       .domain([0, max(data, (d) => d.totalMinutes) as number])
       .range([canvasHeight, 0])
@@ -91,8 +95,7 @@ const TimePlot = ({
       .duration(duration)
       .call(
         axisBottom(xScale)
-          .tickValues(tickValues.values())
-          .tickFormat((d) => formatWeekTick(+d)),
+          .tickFormat(d => new Date(d).toLocaleDateString([], { "weekday": "short" }))
       );
 
     pinnedAxes

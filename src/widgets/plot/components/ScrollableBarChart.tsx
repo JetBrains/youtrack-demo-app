@@ -43,7 +43,7 @@ const ScrollableBarChart = ({
   const viewWidth = width > 0 ? width : 0;
 
   // the scrolling area is everything right of the pinned y-axis
-  const visibleWidth = viewWidth - margins.left;
+  const visibleWidth = viewWidth - margins.left - margins.right;
   const contentWidth = Math.max(visibleWidth, data.length * BAR_STEP + margins.right);
   const canvasHeight = viewHeight - margins.top - margins.bottom;
 
