@@ -23,6 +23,35 @@ body {
 
 #graph {
   grid-area: graph;
+  position: relative;
+}
+
+.resize-indicator {
+  position: absolute;
+  top: var(--ring-unit);
+  right: var(--ring-unit);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--ring-unit);
+  padding: calc(var(--ring-unit) / 2) var(--ring-unit);
+  border-radius: 1em;
+  background-color: var(--ring-content-background-color);
+  color: var(--ring-text-color);
+  box-shadow: 0 0 0 1px var(--ring-line-color, currentColor);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.resize-indicator--visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resize-indicator {
+    transition: none;
+  }
 }
 
 #summary {
@@ -31,6 +60,10 @@ body {
 
 #header {
   grid-area: header;
+}
+
+#dummy {
+  stroke: 1px solid red;
 }
 
 /* styling svg text and lines the same way as native p-element text */

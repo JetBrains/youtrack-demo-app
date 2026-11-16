@@ -1,10 +1,12 @@
-import React, {memo, useEffect, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
     timeDay,
     timeMonday,
     timeMonth
 } from "d3-time"
-import type {HostAPI} from "../../../@types/globals";
+import type {EmbeddableWidgetAPI, HostAPI} from "../../../@types/globals";
+import {Configuration} from './components/Configuration.tsx';
+import type {WidgetConfiguration} from './utils/types.d.ts';
 import "@jetbrains/ring-ui-built/components/style.css";
 import "./app.css"
 import {sub} from "date-fns"
@@ -21,16 +23,61 @@ import {author, ExtractedDataPoint, ChartDataPoint, FetchedDataPoint } from "./u
 import ButtonToolbar from "@jetbrains/ring-ui-built/components/button-toolbar/button-toolbar";
 import TimePlot from './components/TimePlot.tsx';
 import CategoryFilterTable from './components/CategoryFilterTable.tsx';
-import { fetchWorkItems } from './utils/fetching.ts';
+import { useResizeObserver } from './hooks/useResizeObserver.ts';
 import DatePicker from '@jetbrains/ring-ui-built/components/date-picker/date-picker.js';
+import DummyComponent from './components/DummyComponent.tsx';
+import { mockData } from './utils/mockData.ts';
+import ResizeScreen from './components/ResizeScreen.tsx';
 
 const AppComponent = () => {
-    const [containerWidth, setContainerWidth] = useState(0);
-    const [containerHeight, setContainerHeight] = useState(0);
+    const [plotEl, setPlotEl] = useState<HTMLDivElement|null>(null);
+    const [devMode, setDevMode] = useState<boolean>(true);
+    const { width: containerWidth, height: containerHeight, isResizing } = useResizeObserver(plotEl);
+    const [isConfiguring, setIsConfiguring] = useState<boolean>(false);
+    const [config, setConfig] = useState<WidgetConfiguration>({ name: "" });
+    const [host, setHost] = useState<EmbeddableWidgetAPI|"localhost">("localhost");
 
-    const [loading, setLoading] = useState<boolean>(true);
-    const [isConfiguring, setIsConfiguring] = useState(false);
-    
+    useEffect(() => {
+        const register = async () => {
+            if (devMode) {
+                setHost("localhost");
+                return;
+            }
+
+            try {
+                const newHost = await YTApp.register({onConfigure: () => setIsConfiguring(true)});
+                if (!('readConfig' in newHost)) {
+                    return;
+                }
+                setHost(newHost);
+                const stored = await newHost.readConfig<WidgetConfiguration>();
+                if (stored?.name) {
+                    setConfig(stored);
+                } else {
+                    await newHost.enterConfigMode();
+                    setIsConfiguring(true);
+                }
+            } catch (e) {
+                console.warn('Could not register with YouTrack host', e);
+            }
+        };
+        register();
+    }, []);
+
+    const doneConfiguring = (newConfig?: WidgetConfiguration) => {
+        console.log(newConfig)
+        if (newConfig) {
+            setConfig(newConfig);
+            if (host !== "localhost")
+                host?.storeConfig(newConfig);
+        }
+        setIsConfiguring(false);
+        if (host !== "localhost")
+            host?.exitConfigMode();
+    };
+
+    useEffect(() => console.log("config changed", config), [config])
+
     const [timeframe, setTimeframe] = useState<{ from: Date, to: Date }>({ 
         from: sub(new Date(), { months: 6 }),
         to: new Date()
@@ -41,22 +88,38 @@ const AppComponent = () => {
     const [selectedPerson, setSelectedPerson] = useState<string>("");
     
     const [ChartData, setChartData] = useState<ChartDataPoint[]>([])
-    const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set());
-    
-    const plotRef = useRef<HTMLDivElement|null>(null);
-    const summaryPlotRef = useRef<HTMLDivElement|null>(null);
-    
-    const presentCategories = useMemo(
-        () => new Set(ChartData.map(d => d.contributionCategory)),
-        [ChartData]
-    );
 
-    const categorySummary = useMemo(() => getCategorySummary(ChartData), [ChartData]);
+    const startConfiguring = async () => {
+        if (host === "localhost") {
+            setIsConfiguring(true);
+            return;
+        }
 
+        setIsConfiguring(true);
+        const currentConfig = await host.readConfig<WidgetConfiguration>()
+        if (currentConfig) {
+            setConfig(currentConfig);
+            host.storeConfig(currentConfig);
+        }
+    }
     const loadData = async () => {
         const { from, to } = timeframe;
-        const fetchedData: FetchedDataPoint[] = await fetchWorkItems(from, to, "Subtask of: TODO-380");
-    
+        const fetchData = async () => {
+          if (host === "localhost") {
+            return mockData(from, to, ["Alice", "Bob", "Charlie"], 200);
+          }
+          
+          const newHost: HostAPI = await YTApp.register();
+          // define which fields you need
+          const query = "Subtask of: TODO-380"
+          const fields = "id,author(id,name,login),duration(minutes),date,text,issue(id,customFields(id,name,value(id,name)))"
+          const startDate = from.toISOString().split("T")[0];
+          const endDate = to.toISOString().split("T")[0];
+          
+          return await newHost.fetchYouTrack(`workItems?startDate=${startDate}&endDate=${endDate}&fields=${fields}&query=${query}`);
+        }
+        
+        const fetchedData = await fetchData();
         const authors = extractAllPeople(fetchedData);
         setAuthors(authors);
 
@@ -81,55 +144,13 @@ const AppComponent = () => {
         setChartData([...povData]);
     }, [extractedDataPoints, selectedPerson]);
 
-    // whenever the data changes (person, dates, grouping), all present categories start active
-    useEffect(() => {
-        setActiveCategories(new Set(presentCategories));
-    }, [presentCategories]);
+    if (isConfiguring) {
 
-    const toggleCategory = (category: string) => {
-        setActiveCategories(prev => {
-            const next = new Set(prev);
-            if (next.has(category)) {
-                next.delete(category);
-            } else {
-                next.add(category);
-            }
-            return next;
-        });
-    };
-
-    useEffect(() => {
-        if (!plotRef.current) {
-            return;
-        }
-
-        const resizeObserver = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                setContainerWidth(entry.contentRect.width);
-                setContainerHeight(entry.contentRect.height);
-            }
-        });
-
-        resizeObserver.observe(plotRef.current);
-        return () => resizeObserver.disconnect();
-    }, []);
-
-
-    useEffect(() => {
-        if (!summaryPlotRef.current) {
-            return;
-        }
-
-        const resizeObserver = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                setContainerWidth(entry.contentRect.width);
-                setContainerHeight(entry.contentRect.height);
-            }
-        });
-
-        resizeObserver.observe(summaryPlotRef.current);
-        return () => resizeObserver.disconnect();
-    }, []);
+        return <Configuration
+            onDone={doneConfiguring}
+            initialName={config?.name}
+        />;
+    }
 
     return (
       <>
@@ -158,6 +179,12 @@ const AppComponent = () => {
                 Refresh Data
             </Button>
 
+            <Button
+                onClick={() => setIsConfiguring(!isConfiguring)}
+            >
+                Toggle Config
+            </Button>
+
             <DatePicker
                 clear
                 from={timeframe.from}
@@ -171,17 +198,15 @@ const AppComponent = () => {
         <section
             id="graph"
             className="component"
-            ref={plotRef}
+            ref={setPlotEl}
         >
-          <TimePlot
-            data={ChartData}
-            width={containerWidth}
-            height={containerHeight}
-            activeCategories={activeCategories}
-          />
-        </section>
-        <section id="summary">
-          <p>On average, you contribute</p>
+            {isResizing && <ResizeScreen message="lol" />}
+            {isResizing === false && <DummyComponent
+                data={ChartData}
+                config={config}
+                width={containerWidth}
+                height={containerHeight}
+            />}
         </section>
       </>
     )

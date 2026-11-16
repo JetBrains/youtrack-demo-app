@@ -1,3 +1,7 @@
+export type WidgetConfiguration = {
+    name: string;
+}
+
 export type author = {
     id: string;
     login: string;
