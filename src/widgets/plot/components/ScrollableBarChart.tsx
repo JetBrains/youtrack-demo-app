@@ -27,10 +27,12 @@ const ScrollableBarChart = ({
   data,
   width,
   height,
+  isResizing
 }: {
   data: ChartDataPoint[];
   width: number;
   height: number;
+  isResizing: boolean;
 }) => {
   const axisRef = useRef<SVGSVGElement>(null);
   const chartRef = useRef<SVGSVGElement>(null);
@@ -54,7 +56,11 @@ const ScrollableBarChart = ({
       return;
     }
 
-    console.log(data)
+    if (isResizing) {
+      console.log("resizing...")
+      return
+    }
+    console.info("rendering again!")
     // animate only on data changes; resizes must update instantly
     const dataChanged =
       previousDataRef.current !== null && previousDataRef.current !== data;
@@ -144,7 +150,7 @@ const ScrollableBarChart = ({
         el.scrollLeft = el.scrollWidth;
       }
     }
-  }, [data, visibleWidth, contentWidth, canvasHeight]);
+  }, [data, isResizing, visibleWidth, contentWidth, canvasHeight]);
 
   return (
     <div className="scrollable-bar-chart">
