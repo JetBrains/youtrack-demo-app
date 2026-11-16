@@ -152,6 +152,42 @@ const ScrollableBarChart = ({
     }
   }, [data, isResizing, visibleWidth, contentWidth, canvasHeight]);
 
+  // hovering the chart + mouse wheel scrolls it horizontally, handled via d3's event binding
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) {
+      return;
+    }
+    const area = select(el);
+    area.on(
+      "wheel.scroll",
+      function (event: WheelEvent) {
+        const node = this as HTMLDivElement;
+        const maxScroll = node.scrollWidth - node.clientWidth;
+        if (maxScroll <= 0) {
+          return; // nothing to scroll, let the page handle the wheel
+        }
+        // trackpads send deltaX directly; mouse wheels only send deltaY
+        let delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+        if (event.deltaMode === 1) {
+          delta *= 16; // lines -> px
+        } else if (event.deltaMode === 2) {
+          delta *= node.clientWidth; // pages -> px
+        }
+        const next = Math.max(0, Math.min(maxScroll, node.scrollLeft + delta));
+        if (next === node.scrollLeft) {
+          return; // at an edge, let the page scroll on
+        }
+        event.preventDefault();
+        node.scrollLeft = next;
+      },
+      { passive: false },
+    );
+    return () => {
+      area.on("wheel.scroll", null);
+    };
+  }, []);
+
   return (
     <div className="scrollable-bar-chart">
       <svg
