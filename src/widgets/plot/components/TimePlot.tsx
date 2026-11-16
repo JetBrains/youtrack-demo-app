@@ -16,6 +16,7 @@ import { margins } from "../utils/constants.ts";
 
 const TRANSITION_MS = 500;
 const MIN_TICK_SPACING_PX = 48;
+const MIN_STEP_WIDTH = 10;
 
 const formatWeekTick = (ms: number) =>
   new Date(ms).toLocaleDateString([], { day: "2-digit", month: "short" });
@@ -23,24 +24,31 @@ const formatWeekTick = (ms: number) =>
 
 const TimePlot = ({
   data,
+  timeframe,
   width,
-  height
+  height,
+  isResizing
 }: {
   data: ChartDataPoint[];
+  timeframe: { from: Date, to: Date };
   width: number;
   height: number;
+  isResizing: boolean;
 }) => {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const pinnedRef = useRef<SVGSVGElement>(null);
+  const chartRef = useRef<SVGSVGElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const previousDataRef = useRef<ChartDataPoint[] | null>(null);
-  const previousActiveRef = useRef<Set<string> | null>(null);
 
   const viewBoxHeight = height > 0 ? height : 0;
   const viewBoxWidth = width > 0 ? width : 0;
 
   useEffect(() => {
-    if (!svgRef.current) {
+    if (!chartRef.current) {
         return;
     }
+
+  
 
     const canvasWidth = viewBoxWidth - margins.left - margins.right;
     const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
@@ -52,21 +60,23 @@ const TimePlot = ({
     // animate only when the data or category toggles changed (and it is not the first paint);
     // resizes must update instantly, otherwise every resize tick restarts all transitions
     const dataChanged = previousDataRef.current !== null && previousDataRef.current !== data;
-    const categoriesChanged = previousActiveRef.current !== null;
     previousDataRef.current = data;
 
-    const duration = dataChanged || categoriesChanged ? TRANSITION_MS : 0;
+    const duration = dataChanged ? TRANSITION_MS : 0;
 
-    const svg = select(svgRef.current);
+    const svg = select(chartRef.current);
+    const pinnedAxes = select(pinnedRef.current);
 
     // x: one band per day from the first day with data until now
-    const minDate = data[0].date;
     const days: Date[] = timeDay
-      .range(timeDay.floor(minDate), new Date());
+      .range(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to));
+
+    // the scrolling area is everything right of the pinned y-axis
+    const contentWidth = Math.max(canvasWidth, data.length * MIN_STEP_WIDTH);
 
     const xScale = scaleBand<number>()
       .domain(days)
-      .range([0, canvasWidth])
+      .range([0, contentWidth])
       .padding(0.2);
 
     const yScale = scaleLinear()
@@ -85,7 +95,7 @@ const TimePlot = ({
           .tickFormat((d) => formatWeekTick(+d)),
       );
 
-    svg
+    pinnedAxes
       .select<SVGGElement>(".y.axis")
       .transition()
       .duration(duration)
@@ -172,33 +182,76 @@ const TimePlot = ({
       ;
   }, [data, viewBoxWidth, viewBoxHeight]);
 
+  
+  // hovering the chart + mouse wheel scrolls it horizontally, handled via d3's event binding
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) {
+      return;
+    }
+
+    const area = select(el);
+    area.on(
+      "wheel.scroll",
+      function (event: WheelEvent) {
+        const node = this as HTMLDivElement;
+        const maxScroll = node.scrollWidth - node.clientWidth;
+        if (maxScroll <= 0) {
+          return; // nothing to scroll, let the page handle the wheel
+        }
+        // trackpads send deltaX directly; mouse wheels only send deltaY
+        let delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+        if (event.deltaMode === 1) {
+          delta *= 16; // lines -> px
+        } else if (event.deltaMode === 2) {
+          delta *= node.clientWidth; // pages -> px
+        }
+        const next = Math.max(0, Math.min(maxScroll, node.scrollLeft + delta));
+        if (next === node.scrollLeft) {
+          return; // at an edge, let the page scroll on
+        }
+        event.preventDefault();
+        node.scrollLeft = next;
+      },
+      { passive: false },
+    );
+    return () => {
+      area.on("wheel.scroll", null);
+    };
+  }, []);
+
   const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
   const canvasWidth = viewBoxWidth - margins.left - margins.right;
   return (
-    <svg
-      ref={svgRef}
-      width={viewBoxWidth}
-      height={viewBoxHeight}
-      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-    >
-      
-      <g
-        className="axes"
-        transform={`translate(${margins.left}, ${margins.top})`}
+    <div className={`scrollable-bar-chart ${isResizing ? "resizing" : ""}`}>
+      <svg
+        ref={pinnedRef}
+        className="pinned axes"
+        width={margins.left}
+        height={viewBoxHeight}
       >
-         <text
-          textAnchor="end"
-          transform={`translate(${canvasWidth}, ${margins.top})`}>
-          Container width {width} x height {height}
-        </text>
-        <g className="x axis" transform={`translate(0, ${canvasHeight})`}/>
-        <g className="y axis"/>
-      </g>
-      <g
-        className="canvas"
-        transform={`translate(${margins.left}, ${margins.top})`}
-      />
-    </svg>
+        <g
+          className="y axis"
+          transform={`translate(${margins.left}, ${margins.top})`}
+        />
+      </svg>
+      <div ref={scrollRef} className="scroll-area">
+        <svg 
+          ref={chartRef}
+          width={viewBoxWidth - margins.left}
+          height={viewBoxHeight - margins.top}
+          transform={`translate(0, ${margins.top})`}
+        >
+          <g
+            className="canvas"
+          />
+          <g
+            className="x axis"
+            transform={`translate(0, ${canvasHeight})`}
+          />
+        </svg>
+      </div>
+    </div>
   );
 };
 

@@ -34,12 +34,9 @@ import {
 import ButtonToolbar from "@jetbrains/ring-ui-built/components/button-toolbar/button-toolbar";
 import TimePlot from "./components/TimePlot.tsx";
 import ScrollableBarChart from "./components/ScrollableBarChart.tsx";
-import CategoryFilterTable from "./components/CategoryFilterTable.tsx";
 import { useResizeObserver } from "./hooks/useResizeObserver.ts";
 import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-picker.js";
-import DummyComponent from "./components/DummyComponent.tsx";
 import { mockData } from "./utils/mockData.ts";
-import ResizeScreen from "./components/ResizeScreen.tsx";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -218,8 +215,9 @@ const AppComponent = () => {
       </section>
       <section id="graph" className="component" ref={setPlotEl}>
         {(
-          <ScrollableBarChart
+          <TimePlot
             data={ChartData}
+            timeframe={timeframe}
             isResizing={isResizing}
             width={containerWidth}
             height={containerHeight}
