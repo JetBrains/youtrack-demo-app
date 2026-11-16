@@ -24,13 +24,11 @@ const formatWeekTick = (ms: number) =>
 const TimePlot = ({
   data,
   width,
-  height,
-  activeCategories,
+  height
 }: {
   data: ChartDataPoint[];
   width: number;
   height: number;
-  activeCategories: Set<string>;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const previousDataRef = useRef<ChartDataPoint[] | null>(null);
@@ -54,9 +52,8 @@ const TimePlot = ({
     // animate only when the data or category toggles changed (and it is not the first paint);
     // resizes must update instantly, otherwise every resize tick restarts all transitions
     const dataChanged = previousDataRef.current !== null && previousDataRef.current !== data;
-    const categoriesChanged = previousActiveRef.current !== null && previousActiveRef.current !== activeCategories;
+    const categoriesChanged = previousActiveRef.current !== null;
     previousDataRef.current = data;
-    previousActiveRef.current = activeCategories;
 
     const duration = dataChanged || categoriesChanged ? TRANSITION_MS : 0;
 
@@ -170,16 +167,13 @@ const TimePlot = ({
       .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
       .transition()
       .duration(duration)
-      .attr("y", (d) => (activeCategories.has(d.contributionCategory) ? yScale(d.minutes) : canvasHeight))
-      .attr("opacity", (d) => activeCategories.has(d.contributionCategory))
-      .attr("height", (d) =>
-        activeCategories.has(d.contributionCategory) ? yScale(0) - yScale(d.minutes) : 0,
-      )
+      .attr("y", (d) => yScale(d.minutes))
+      .attr("height", (d) => yScale(0) - yScale(d.minutes))
       ;
-  }, [data, activeCategories, viewBoxWidth, viewBoxHeight]);
+  }, [data, viewBoxWidth, viewBoxHeight]);
 
   const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
-
+  const canvasWidth = viewBoxWidth - margins.left - margins.right;
   return (
     <svg
       ref={svgRef}
@@ -187,10 +181,16 @@ const TimePlot = ({
       height={viewBoxHeight}
       viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
     >
+      
       <g
         className="axes"
         transform={`translate(${margins.left}, ${margins.top})`}
       >
+         <text
+          textAnchor="end"
+          transform={`translate(${canvasWidth}, ${margins.top})`}>
+          Container width {width} x height {height}
+        </text>
         <g className="x axis" transform={`translate(0, ${canvasHeight})`}/>
         <g className="y axis"/>
       </g>

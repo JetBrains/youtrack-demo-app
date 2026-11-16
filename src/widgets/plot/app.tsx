@@ -217,11 +217,18 @@ const AppComponent = () => {
       </section>
       <section id="graph" className="component" ref={setPlotEl}>
         {isResizing && <ResizeScreen message="Resizing" />}
-        
+{/* 
         {isResizing === false && (
           <DummyComponent
             data={ChartData}
             config={config}
+            width={containerWidth}
+            height={containerHeight}
+          />
+        )} */}
+        {isResizing === false && (
+          <TimePlot
+            data={ChartData}
             width={containerWidth}
             height={containerHeight}
           />
