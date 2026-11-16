@@ -90,13 +90,14 @@ g.grid line {
   opacity: 0.25;
 }
 
-line {
-  stroke: currentColor;
+.axis line, .axis path {
+    stroke: currentColor;
+  }
+
+.axis text {
+  fill: rebeccapurple;
 }
 
-path {
-  stroke: none;
-}
 
 /* scrollable hours-per-day chart: pinned y-axis + horizontally scrolling bars */
 .scrollable-bar-chart {
@@ -117,38 +118,9 @@ path {
   overflow-y: hidden;
 }
 
+
 .scrollable-bar-chart .scroll-area svg {
   display: block;
-}
-
-.scrollable-bar-chart .axis path.domain {
-  stroke: currentColor;
-  stroke-opacity: 0.4;
-}
-
-.category-list {
-  display: grid;
-  gap: calc(var(--ring-unit) * 2);
-  margin: var(--ring-unit) 0;
-  grid-auto-flow: column;
-}
-
-.category-list .item {
-  padding: var(--ring-font-size);
-  border-radius: 1em;
-  border: 3px solid  var(--category-colour);
-  line-height: 0.8;
-}
-
-.category-list .item p {
-  margin: var(--ring-font-size-smaller) 0;
-}
-
-.category-row .numeric {
-  text-align: left;
-  font-size: var(--ring-font-size-smaller);
-  opacity: 0.6;
-  font-variant-numeric: tabular-nums;
 }
 
 .component {
@@ -156,4 +128,9 @@ path {
   display: flex;
   padding: var(--ring-unit) * 2;
   overflow: hidden;
+}
+
+.resizing g.canvas * {
+  filter: grayscale();
+  opacity: 0.5;
 }
