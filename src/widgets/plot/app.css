@@ -23,6 +23,35 @@ body {
 
 #graph {
   grid-area: graph;
+  position: relative;
+}
+
+.resize-indicator {
+  position: absolute;
+  top: var(--ring-unit);
+  right: var(--ring-unit);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--ring-unit);
+  padding: calc(var(--ring-unit) / 2) var(--ring-unit);
+  border-radius: 1em;
+  background-color: var(--ring-content-background-color);
+  color: var(--ring-text-color);
+  box-shadow: 0 0 0 1px var(--ring-line-color, currentColor);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.resize-indicator--visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resize-indicator {
+    transition: none;
+  }
 }
 
 #summary {
@@ -31,6 +60,10 @@ body {
 
 #header {
   grid-area: header;
+}
+
+#dummy {
+  stroke: 1px solid red;
 }
 
 /* styling svg text and lines the same way as native p-element text */
@@ -58,37 +91,37 @@ g.grid line {
   opacity: 0.25;
 }
 
-line {
-  stroke: currentColor;
+.axis line, .axis path {
+    stroke: currentColor;
+  }
+
+.axis text {
+  fill: rebeccapurple;
 }
 
-path {
-  stroke: none;
+
+/* scrollable hours-per-day chart: pinned y-axis + horizontally scrolling bars */
+.scrollable-bar-chart {
+  display: flex;
+  width: 100%;
+  min-width: 0;
 }
 
-.category-list {
-  display: grid;
-  gap: calc(var(--ring-unit) * 2);
-  margin: var(--ring-unit) 0;
-  grid-auto-flow: column;
+.scrollable-bar-chart .pinned-axis {
+  flex: none;
+  overflow: visible;
 }
 
-.category-list .item {
-  padding: var(--ring-font-size);
-  border-radius: 1em;
-  border: 3px solid  var(--category-colour);
-  line-height: 0.8;
+.scrollable-bar-chart .scroll-area {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-.category-list .item p {
-  margin: var(--ring-font-size-smaller) 0;
-}
 
-.category-row .numeric {
-  text-align: left;
-  font-size: var(--ring-font-size-smaller);
-  opacity: 0.6;
-  font-variant-numeric: tabular-nums;
+.scrollable-bar-chart .scroll-area svg {
+  display: block;
 }
 
 .component {
@@ -96,4 +129,9 @@ path {
   display: flex;
   padding: var(--ring-unit) * 2;
   overflow: hidden;
+}
+
+.resizing g.canvas * {
+  filter: grayscale();
+  opacity: 0.5;
 }

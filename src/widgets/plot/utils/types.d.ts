@@ -1,4 +1,6 @@
-import {TimeInterval} from "d3";
+export type WidgetConfiguration = {
+    name: string;
+}
 
 export type author = {
     id: string;
@@ -37,8 +39,4 @@ export type ChartConfig = {
     width: number,
     height: number,
     mode: "day" | "week"
-}
-
-export interface WidgetConfiguration {
-    query: string;
 }

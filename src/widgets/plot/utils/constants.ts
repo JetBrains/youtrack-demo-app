@@ -1,8 +1,6 @@
 import { scaleDiverging } from "d3";
-import {timeDay, timeMonday, timeMonth} from "d3-time";
 
-// export const colorScaleContributionLinear = scaleDiverging(["#ff1f6b", "#ffef5b", "#008d4b"]);
-export const colorScaleContributionLinear = scaleDiverging(["#ff1f6b", "#e45bff", "#0065ff"]);
+export const colorScaleContributionLinear = scaleDiverging(["#ff1f6b", "#ffef5b", "#008d4b"]);
 
 export const contributionLabels = {
     "en": [
@@ -14,8 +12,6 @@ export const contributionLabels = {
     ]
 }
 
-export const margins = { top: 10, right: 20, bottom: 30, left: 60 };
-
-// Used only in dev preview (no YouTrack host) to generate fake worklogs
-export const MOCK_AUTHORS = ["Alice", "Bob", "Carol"];
-export const MOCK_WORKLOG_COUNT = 400;
+export const margins = { top: 20, right: 20, bottom: 50, left: 40 };
+// horizontal px per day in the scrollable bar chart (bar + gap)
+// export const colorScaleContributionLinear = scaleDiverging(["#ff1f6b", "#e45bff", "#0065ff"]);
