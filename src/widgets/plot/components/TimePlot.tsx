@@ -15,7 +15,7 @@ import { margins } from "../utils/constants.ts";
 import { TimeAggregationOption } from "../utils/classes.ts";
 
 const TRANSITION_MS = 500;
-const MIN_STEP_WIDTH = 10;
+const MIN_STEP_WIDTH = 30;
 
 const TimePlot = ({
   data,
@@ -116,24 +116,24 @@ const TimePlot = ({
                 .attr("y", canvasHeight)
                 .attr("height", 0)
                 .attr("opacity", (d) => 0.2);
-            rects.transition()
-                .delay(duration)
-                .duration(duration)
+
+            rects
                 .attr("x", (d) => xScale(d.date) ?? 0)
                 .attr("y", (d) => yScale(d.totalMinutes))
                 .attr("height", (d) => canvasHeight - yScale(d.totalMinutes))
             rects.append("title");
             return rects;
         },
-        (update) => update.transition()
-                          .duration(duration)
+        (update) => update
+                          // .transition()
+                          // .duration(duration)
                           .attr("x", (d) => xScale(d.date) ?? 0)
                           .attr("y", (d) => yScale(d.totalMinutes))
                           .attr("height", (d) => canvasHeight - yScale(d.totalMinutes)),
         (exit) =>
           exit
-            .transition()
-            .duration(duration)
+            // .transition()
+            // .duration(duration)
             .attr("y", (d) => yScale(d.totalMinutes))
             .attr("height", (d) => canvasHeight - yScale(d.totalMinutes))
             .remove(),
@@ -154,8 +154,9 @@ const TimePlot = ({
                 .attr("y", canvasHeight)
                 .attr("height", 0);
 
-            rects.transition()
-                .duration(duration)
+            rects
+                // .transition()
+                // .duration(duration)
                 .attr("x", (d) => xScale(d.date) ?? 0)
                 .attr("y", (d) => yScale(d.minutes))
                 .attr("height", (d) => canvasHeight - yScale(d.minutes));
@@ -164,16 +165,16 @@ const TimePlot = ({
         },
         (update) => {
           return update
-                    .transition()
-                    .duration(duration)
+                    // .transition()
+                    // .duration(duration)
                     .attr("x", (d) => xScale(d.date) ?? 0)
                     .attr("y", (d) => yScale(d.minutes))
                     .attr("height", (d) => canvasHeight - yScale(d.minutes));
         },
         (exit) =>
             exit
-                .transition()
-                .duration(duration)
+                // .transition()
+                // .duration(duration)
                 .attr("y", (d) => yScale(d.minutes))
                 .attr("height", (d) => yScale(0) - yScale(d.minutes))      
                 .remove(),
@@ -184,8 +185,8 @@ const TimePlot = ({
           .select("title")
           .text((d) => describeDataPoint(d)),
       )
-      .transition()
-      .duration(duration)
+      // .transition()
+      // .duration(duration)
       .attr("width", xScale.bandwidth())
       .attr("fill", (d) => colorScaleContributionCategorical(d.contribution));
   }, [data, viewBoxWidth, viewBoxHeight]);
@@ -240,7 +241,7 @@ const TimePlot = ({
       >
         <g
           className="y axis"
-          transform={`translate(${margins.left}, ${margins.top})`}
+          transform={`translate(${margins.left - 1}, ${margins.top})`}
         />
       </svg>
       <div ref={scrollRef} className="scroll-area">

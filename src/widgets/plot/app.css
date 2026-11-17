@@ -73,10 +73,6 @@ text {
   font-size: var(--ring-font-size);
 }
 
-g.axes  text {
-  font-size: var(--ring-font-size-smaller);
-}
-
 g.canvas rect.total-minutes {
   fill: currentColor;
   opacity: .1;
@@ -92,13 +88,8 @@ g.grid line {
 }
 
 .axis line, .axis path {
-    stroke: currentColor;
-  }
-
-.axis text {
-  fill: rebeccapurple;
+  stroke: currentColor;
 }
-
 
 /* scrollable hours-per-day chart: pinned y-axis + horizontally scrolling bars */
 .scrollable-bar-chart {

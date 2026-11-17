@@ -13,9 +13,8 @@ export const changeOpacity = (colorString: string, opacity: number): string => {
     return color(colorString)!.copy({ opacity }).formatHex8()
 }
 
-export const colorScaleContributionCategorical = scaleThreshold().domain(
-    contributionLabels.en.map((_, i) => i / contributionLabels.en.length)
-).range(
+export const colorScaleContributionCategorical = scaleThreshold(
+    contributionLabels.en.map((_, i) => i / contributionLabels.en.length),
     [...contributionLabels.en.map((_, i) => colorScaleContributionLinear(i/ contributionLabels.en.length / 0.8))]
 )
 
@@ -28,7 +27,7 @@ const constructContributionLabelScale = (labels: string[]) => {
 
 
 export const contributionLabelScale = constructContributionLabelScale(contributionLabels.en)
-console.log(contributionLabelScale(0.9))
+
 const constructContributionCategoryColour = (labels: string[]) => {
     const colors: string[] = labels.map((_, i) => colorScaleContributionLinear(i / (labels.length - 1)));
     const pairs = zip(labels, colors) as [string, string][]
