@@ -4,7 +4,7 @@ import { ChartDataPoint } from "../utils/types.d.ts";
 
 import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
-import { max, union } from "d3-array";
+import { max, sort, union } from "d3-array";
 import { select } from "d3-selection";
 import { scaleBand, scaleLinear, scaleTime } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
@@ -114,48 +114,50 @@ const TimePlot = ({
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     canvas
       .selectAll<SVGRectElement, ChartDataPoint[]>("rect.total-minutes")
-      .data(data, (d) => d.date)
+      .data(sort(data, d => d.date), (d) => d.date)
       .join(
         (enter) => {
             const rects = enter
                 .append("rect")
-                .attr("class", "total-minutes")
-                .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
-                .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
                 .attr("height", 0)
-                .attr("opacity", (d) => 0.2)
+                .attr("opacity", (d) => 0.2);
+
+              rects
+                .transition()
+                .duration(duration)
+                .delay((_, i) => i * 10)
                 .attr("y", (d) => yScale(d.totalMinutes))
-                .attr("height", (d) => canvasHeight - yScale(d.totalMinutes))
+                .attr("height", (d) => canvasHeight - yScale(d.totalMinutes));
+
             rects.append("title");
             return rects;
         },
         (update) => update
-                      .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
-                      .attr("width", xScale.bandwidth())
                       .transition()
                       .duration(duration)
                       .attr("y", (d) => yScale(d.totalMinutes))
                       .attr("height", (d) => canvasHeight - yScale(d.totalMinutes)),
+
         (exit) => exit.remove(),
       )
-      .attr("data-value", (d) => d.totalMinutes);
+      .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
+      .attr("width", xScale.bandwidth())
+      .attr("data-value", (d) => d.totalMinutes)
+      .attr("class", "total-minutes");
 
     canvas
       .selectAll<SVGRectElement, ChartDataPoint>("rect.own-contribution")
-      .data(data, d => d.date)
+      .data(sort(data, d => d.date), d => d.date)
       .join(
         (enter) => {
             const rects = enter
                 .append("rect")
-                .attr("class", "own-contribution")
                 .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
-                .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
-                .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
                 .attr("height", 0);
 
-            rects
+            rects                
                 .transition()
                 .duration(duration)
                 .attr("y", (d) => yScale(d.minutes))
@@ -165,10 +167,11 @@ const TimePlot = ({
         },
         (update) => {
           return update
+                    .attr("y", canvasHeight)
+                    .attr("height", 0)
                     .transition()
-                    .duration(duration / 2)
-                    .attr("x", (d) => xScale(d.date) ?? -xScale.bandwidth())  
-                    .attr("width", xScale.bandwidth())
+                    .duration(duration)
+                    .delay((_, i) => 100 + i * 10)
                     .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
                     .attr("y", (d) => yScale(d.minutes))
                     .attr("height", (d) => canvasHeight - yScale(d.minutes));
@@ -176,6 +179,9 @@ const TimePlot = ({
         (exit) => exit.remove(),
       )
       .attr("data-value", (d) => d.contribution)
+      .attr("class", "own-contribution")
+      .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
+      .attr("width", xScale.bandwidth())
       .call((rects) =>
         rects
           .select("title")
