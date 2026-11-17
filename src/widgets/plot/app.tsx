@@ -37,6 +37,7 @@ import ScrollableBarChart from "./components/ScrollableBarChart.tsx";
 import { useResizeObserver } from "./hooks/useResizeObserver.ts";
 import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-picker.js";
 import { mockData } from "./utils/mockData.ts";
+import { timeAggregationOptions } from "./utils/constants.ts";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -112,6 +113,7 @@ const AppComponent = () => {
     from: sub(new Date(), { months: 6 }),
     to: new Date(),
   });
+  const [selectedTimeAggregationKey, setSelectedTimeAggregationKey] = useState<string>("week")
 
   const [extractedDataPoints, setExtractedDataPoints] = useState<
     ExtractedDataPoint[]
@@ -161,17 +163,15 @@ const AppComponent = () => {
     if (extractedDataPoints.length === 0) {
       return;
     }
-    const { from, to } = timeframe;
-    const groupingFunction = timeDay;
+
+    const groupingFunction = timeAggregationOptions.get(selectedTimeAggregationKey)!.dateAggregationFunction;
     const povData = evaluateFromPOV(
-      selectedPerson,
-      extractedDataPoints,
-      from,
-      to,
+        selectedPerson,
+        extractedDataPoints,
         groupingFunction
     );
     setChartData([...povData]);
-  }, [extractedDataPoints, selectedPerson]);
+  }, [extractedDataPoints, selectedPerson, selectedTimeAggregationKey]);
 
   if (isConfiguring) {
     return (
@@ -199,6 +199,21 @@ const AppComponent = () => {
 
           <Button onClick={() => loadData()}>Refresh Data</Button>
 
+          <ButtonGroup>
+            {Array.from(timeAggregationOptions.keys()).map((key) => {
+              return (
+                <Button
+                  key={key}
+                  value={key}
+                  onClick={() => setSelectedTimeAggregationKey(key)}
+                  active={key === selectedTimeAggregationKey}
+                >
+                  {key}
+                </Button>
+              )
+            })}
+          </ButtonGroup>
+
           <Button onClick={() => setIsConfiguring(!isConfiguring)}>
             Toggle Config
           </Button>
@@ -217,6 +232,7 @@ const AppComponent = () => {
         {(
           <TimePlot
             data={ChartData}
+            timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
             timeframe={timeframe}
             isResizing={isResizing}
             width={containerWidth}

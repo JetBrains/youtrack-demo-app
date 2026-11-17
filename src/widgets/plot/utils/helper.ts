@@ -56,7 +56,13 @@ export const describeDataPoint = (d: ChartDataPoint) => {
     )
 }
 
-export const getEmptyMap = (from: Date, to: Date) => timeDays(timeDay.floor(from), timeDay.ceil(to))
+// Takes a date and returns a function that yields its quarter label, e.g. "Q1"
+export const getQuarterLabel = (date: Date): (() => string) => {
+    const quarter = Math.floor(date.getMonth() / 3) + 1;
+    return () => `Q${quarter}`;
+};
+
+export const getEmptyMap =(from: Date, to: Date) => timeDays(timeDay.floor(from), timeDay.ceil(to))
 
 export const calculateAverageOtherContribution = (
     minutesByPerson: InternMap<string, number>,

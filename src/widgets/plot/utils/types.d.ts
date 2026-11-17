@@ -1,3 +1,5 @@
+import { TimeInterval } from "d3";
+
 export type WidgetConfiguration = {
     name: string;
 }
@@ -37,6 +39,5 @@ export type ChartConfig = {
     viewBoxHeight?: number,
     data: ChartDataPoint[],
     width: number,
-    height: number,
-    mode: "day" | "week"
+    height: number
 }

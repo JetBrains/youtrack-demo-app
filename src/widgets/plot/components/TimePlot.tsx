@@ -4,36 +4,33 @@ import { ChartDataPoint } from "../utils/types.d.ts";
 
 import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
-import { every, max, union } from "d3-array";
+import { max, union } from "d3-array";
 import { select } from "d3-selection";
 import { scaleBand, scaleLinear, scaleTime } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
-import { timeDay, timeMonday } from "d3-time";
+import { timeDay, timeDays } from "d3-time";
 import "d3-transition";
-import { easeBounce, easeBounceIn, easeElastic } from "d3";
 import { describeDataPoint } from "../utils/helper.ts";
 import { margins } from "../utils/constants.ts";
+import { TimeAggregationOption } from "../utils/classes.ts";
 
 const TRANSITION_MS = 500;
-const MIN_TICK_SPACING_PX = 48;
-const MIN_STEP_WIDTH = 25;
-
-const formatWeekTick = (ms: number) =>
-  new Date(ms).toLocaleDateString([], { day: "2-digit", month: "short" });
-
+const MIN_STEP_WIDTH = 10;
 
 const TimePlot = ({
   data,
   timeframe,
   width,
   height,
-  isResizing
+  isResizing,
+  timeAggregation
 }: {
   data: ChartDataPoint[];
   timeframe: { from: Date, to: Date };
   width: number;
   height: number;
   isResizing: boolean;
+  timeAggregation: TimeAggregationOption
 }) => {
   const pinnedRef = useRef<SVGSVGElement>(null);
   const chartRef = useRef<SVGSVGElement>(null);
@@ -66,34 +63,36 @@ const TimePlot = ({
     const svg = select(chartRef.current);
     const pinnedAxes = select(pinnedRef.current);
 
+    const {
+      dateAggregationFunction,
+      tickValueFormattingFunction
+    } = timeAggregation
     // x: one band per day from the first day with data until now
-    const days: Date[] = timeDay
-      .range(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to));
+    const xBandValues: Date[] = timeDays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)).map(dateAggregationFunction);
 
     // the scrolling area is everything right of the pinned y-axis
     const contentWidth = Math.max(canvasWidth, data.length * MIN_STEP_WIDTH);
 
-    const xScale = scaleBand<number>()
-      .domain(days)
+    const xScale = scaleBand<Date>()
+      .domain(xBandValues)
       .range([0, contentWidth])
       .padding(0.2);
-
-      console.log(xScale.domain().length)
 
     const yScale = scaleLinear()
       .domain([0, max(data, (d) => d.totalMinutes) as number])
       .range([canvasHeight, 0])
       .nice();
 
-    const tickValues: Set<Date> = union(days.map((d: Date) => timeMonday(d)))
+    const tickValues: Set<Date> = union(xBandValues.map(dateAggregationFunction))
+
     svg
       .select<SVGGElement>(".x.axis")
       .transition()
       .duration(duration)
       .call(
         axisBottom(xScale)
-            .tickValues(tickValues)
-          .tickFormat(d => new Date(d).toLocaleDateString([], { "weekday": "short" }))
+          .tickValues(tickValues)
+          .tickFormat(tickValueFormattingFunction)
       );
 
     pinnedAxes
@@ -103,7 +102,6 @@ const TimePlot = ({
       .call(axisLeft(yScale));
 
     const canvas = svg.select(".canvas");
-
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     canvas
       .selectAll<SVGRectElement, ChartDataPoint[]>("rect.total-minutes")
@@ -113,7 +111,7 @@ const TimePlot = ({
             const rects = enter
                 .append("rect")
                 .attr("class", "total-minutes")
-                .attr("x", (d) => xScale(d.date.getTime()) ?? 0)
+                .attr("x", (d) => xScale(d.date) ?? 0)
                 .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
                 .attr("height", 0)
@@ -124,17 +122,13 @@ const TimePlot = ({
         (update) => update,
         (exit) =>
           exit
-            .transition()
-            .duration(duration)
-            .attr("y", canvasHeight)
-            .attr("height", 0)
             .remove(),
       )
       .attr("data-value", (d) => d.totalMinutes)
+      .attr("width", xScale.bandwidth())
       .transition()
       .duration(duration)
-      .attr("x", (d) => xScale(d.date.getTime()) ?? 0)
-      .attr("width", xScale.bandwidth())
+      .attr("x", (d) => xScale(d.date) ?? 0)
       .attr("y", (d) => yScale(d.totalMinutes))
       .attr("height", (d) => canvasHeight - yScale(d.totalMinutes));
 
@@ -146,7 +140,7 @@ const TimePlot = ({
             const rects = enter
                 .append("rect")
                 .attr("class", "own-contribution")
-                .attr("x", (d) => xScale(d.date.getTime()) ?? 0)
+                .attr("x", (d) => xScale(d.date) ?? 0)
                 .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
                 .attr("height", 0)
@@ -160,8 +154,6 @@ const TimePlot = ({
             exit
                 .transition()
                 .duration(duration)
-                .transition()
-                .delay(200)
                 .remove(),
       )
       .attr("data-value", (d) => d.contribution)
@@ -170,7 +162,7 @@ const TimePlot = ({
           .select("title")
           .text((d) => describeDataPoint(d)),
       )
-      .attr("x", (d) => xScale(d.date.getTime()) ?? 0)
+      .attr("x", (d) => xScale(d.date) ?? 0)
       .attr("width", xScale.bandwidth())
       .transition()
       .duration(duration / 2)
@@ -238,7 +230,7 @@ const TimePlot = ({
       <div ref={scrollRef} className="scroll-area">
         <svg 
           ref={chartRef}
-          width={viewBoxWidth - margins.left}
+          width={canvasWidth}
           height={viewBoxHeight - margins.top}
           transform={`translate(0, ${margins.top})`}
         >
