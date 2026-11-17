@@ -120,35 +120,26 @@ const TimePlot = ({
             const rects = enter
                 .append("rect")
                 .attr("class", "total-minutes")
-                .attr("x", (d) => xScale(d.date) ?? 0)
+                .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
                 .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
                 .attr("height", 0)
-                .attr("opacity", (d) => 0.2);
-
-            rects
-                .attr("x", (d) => xScale(d.date) ?? 0)
+                .attr("opacity", (d) => 0.2)
                 .attr("y", (d) => yScale(d.totalMinutes))
                 .attr("height", (d) => canvasHeight - yScale(d.totalMinutes))
             rects.append("title");
             return rects;
         },
         (update) => update
-                          // .transition()
-                          // .duration(duration)
-                          .attr("x", (d) => xScale(d.date) ?? 0)
-                          .attr("y", (d) => yScale(d.totalMinutes))
-                          .attr("height", (d) => canvasHeight - yScale(d.totalMinutes)),
-        (exit) =>
-          exit
-            // .transition()
-            // .duration(duration)
-            .attr("y", (d) => yScale(d.totalMinutes))
-            .attr("height", (d) => canvasHeight - yScale(d.totalMinutes))
-            .remove(),
+                      .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
+                      .attr("width", xScale.bandwidth())
+                      .transition()
+                      .duration(duration)
+                      .attr("y", (d) => yScale(d.totalMinutes))
+                      .attr("height", (d) => canvasHeight - yScale(d.totalMinutes)),
+        (exit) => exit.remove(),
       )
-      .attr("data-value", (d) => d.totalMinutes)
-      .attr("width", xScale.bandwidth());
+      .attr("data-value", (d) => d.totalMinutes);
 
     canvas
       .selectAll<SVGRectElement, ChartDataPoint>("rect.own-contribution")
@@ -158,15 +149,15 @@ const TimePlot = ({
             const rects = enter
                 .append("rect")
                 .attr("class", "own-contribution")
-                .attr("x", (d) => xScale(d.date) ?? 0)
+                .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
+                .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
                 .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
                 .attr("height", 0);
 
             rects
-                // .transition()
-                // .duration(duration)
-                .attr("x", (d) => xScale(d.date) ?? 0)
+                .transition()
+                .duration(duration)
                 .attr("y", (d) => yScale(d.minutes))
                 .attr("height", (d) => canvasHeight - yScale(d.minutes));
             rects.append("title");
@@ -174,30 +165,22 @@ const TimePlot = ({
         },
         (update) => {
           return update
-                    // .transition()
-                    // .duration(duration)
-                    .attr("x", (d) => xScale(d.date) ?? 0)
+                    .transition()
+                    .duration(duration / 2)
+                    .attr("x", (d) => xScale(d.date) ?? -xScale.bandwidth())  
+                    .attr("width", xScale.bandwidth())
+                    .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
                     .attr("y", (d) => yScale(d.minutes))
                     .attr("height", (d) => canvasHeight - yScale(d.minutes));
         },
-        (exit) =>
-            exit
-                // .transition()
-                // .duration(duration)
-                .attr("y", (d) => yScale(d.minutes))
-                .attr("height", (d) => yScale(0) - yScale(d.minutes))      
-                .remove(),
+        (exit) => exit.remove(),
       )
       .attr("data-value", (d) => d.contribution)
       .call((rects) =>
         rects
           .select("title")
           .text((d) => describeDataPoint(d)),
-      )
-      // .transition()
-      // .duration(duration)
-      .attr("width", xScale.bandwidth())
-      .attr("fill", (d) => colorScaleContributionCategorical(d.contribution));
+      );
   }, [data, viewBoxWidth, viewBoxHeight, xBandValues, contentWidth, timeAggregation]);
 
   
