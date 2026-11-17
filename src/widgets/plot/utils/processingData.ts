@@ -19,7 +19,7 @@ export const evaluateFromPOV = (authorId: string,
                                 from: Date,
                                 to: Date,
                                 groupingFunction: (d: Date) => Date): ChartDataPoint[] => {
-    console.log(extractedDataPoints[0])
+
     const uniquePersons = union(extractedDataPoints.map(d => d.authorId))
     const minutesByTimeframe = rollup(extractedDataPoints,
         D => {
@@ -56,7 +56,7 @@ export const evaluateFromPOV = (authorId: string,
         const ownContribution: number = minutesByTimeframeAndPersonId.get(dateToCheck)!.get(authorId) || 0;
         const avgMinutes = (totalMinutes - ownContribution) / (uniquePersons.size - 1);
         const contribution = compareContributionToRest([ownContribution, avgMinutes])
-        console.log(date)
+
         return {
             date,
             totalMinutes,

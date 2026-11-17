@@ -48,8 +48,7 @@ const TimePlot = ({
         return;
     }
 
-  
-
+    console.log(timeframe)
     const canvasWidth = viewBoxWidth - margins.left - margins.right;
     const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
     // not measured yet (or nothing to show): wait for the next width/height/data change
@@ -78,6 +77,8 @@ const TimePlot = ({
       .domain(days)
       .range([0, contentWidth])
       .padding(0.2);
+
+      console.log(xScale.domain().length)
 
     const yScale = scaleLinear()
       .domain([0, max(data, (d) => d.totalMinutes) as number])
@@ -142,7 +143,6 @@ const TimePlot = ({
       .data(data, d => d.date)
       .join(
         (enter) => {
-            console.log(data)
             const rects = enter
                 .append("rect")
                 .attr("class", "own-contribution")
@@ -154,7 +154,6 @@ const TimePlot = ({
             return rects;
         },
         (update) => {
-          console.log(update)
           return update
         },
         (exit) =>
