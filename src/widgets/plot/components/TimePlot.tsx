@@ -41,11 +41,13 @@ const TimePlot = ({
   const viewBoxWidth = width > 0 ? width : 0;
 
   useEffect(() => {
-    if (!chartRef.current) {
+    if (!chartRef.current || !pinnedRef.current) {
         return;
     }
 
-    console.log(timeframe)
+    const svg = select(chartRef.current);
+    const pinnedAxes = select(pinnedRef.current);
+
     const canvasWidth = viewBoxWidth - margins.left - margins.right;
     const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
     // not measured yet (or nothing to show): wait for the next width/height/data change
@@ -60,8 +62,6 @@ const TimePlot = ({
 
     const duration = dataChanged ? TRANSITION_MS : 0;
 
-    const svg = select(chartRef.current);
-    const pinnedAxes = select(pinnedRef.current);
 
     const {
       dateAggregationFunction,
@@ -116,21 +116,30 @@ const TimePlot = ({
                 .attr("y", canvasHeight)
                 .attr("height", 0)
                 .attr("opacity", (d) => 0.2);
+            rects.transition()
+                .delay(duration)
+                .duration(duration)
+                .attr("x", (d) => xScale(d.date) ?? 0)
+                .attr("y", (d) => yScale(d.totalMinutes))
+                .attr("height", (d) => canvasHeight - yScale(d.totalMinutes))
             rects.append("title");
             return rects;
         },
-        (update) => update,
+        (update) => update.transition()
+                          .duration(duration)
+                          .attr("x", (d) => xScale(d.date) ?? 0)
+                          .attr("y", (d) => yScale(d.totalMinutes))
+                          .attr("height", (d) => canvasHeight - yScale(d.totalMinutes)),
         (exit) =>
           exit
+            .transition()
+            .duration(duration)
+            .attr("y", (d) => yScale(d.totalMinutes))
+            .attr("height", (d) => canvasHeight - yScale(d.totalMinutes))
             .remove(),
       )
       .attr("data-value", (d) => d.totalMinutes)
-      .attr("width", xScale.bandwidth())
-      .transition()
-      .duration(duration)
-      .attr("x", (d) => xScale(d.date) ?? 0)
-      .attr("y", (d) => yScale(d.totalMinutes))
-      .attr("height", (d) => canvasHeight - yScale(d.totalMinutes));
+      .attr("width", xScale.bandwidth());
 
     canvas
       .selectAll<SVGRectElement, ChartDataPoint>("rect.own-contribution")
@@ -143,17 +152,30 @@ const TimePlot = ({
                 .attr("x", (d) => xScale(d.date) ?? 0)
                 .attr("width", xScale.bandwidth())
                 .attr("y", canvasHeight)
-                .attr("height", 0)
+                .attr("height", 0);
+
+            rects.transition()
+                .duration(duration)
+                .attr("x", (d) => xScale(d.date) ?? 0)
+                .attr("y", (d) => yScale(d.minutes))
+                .attr("height", (d) => canvasHeight - yScale(d.minutes));
             rects.append("title");
             return rects;
         },
         (update) => {
           return update
+                    .transition()
+                    .duration(duration)
+                    .attr("x", (d) => xScale(d.date) ?? 0)
+                    .attr("y", (d) => yScale(d.minutes))
+                    .attr("height", (d) => canvasHeight - yScale(d.minutes));
         },
         (exit) =>
             exit
                 .transition()
                 .duration(duration)
+                .attr("y", (d) => yScale(d.minutes))
+                .attr("height", (d) => yScale(0) - yScale(d.minutes))      
                 .remove(),
       )
       .attr("data-value", (d) => d.contribution)
@@ -162,16 +184,10 @@ const TimePlot = ({
           .select("title")
           .text((d) => describeDataPoint(d)),
       )
-      .attr("x", (d) => xScale(d.date) ?? 0)
-      .attr("width", xScale.bandwidth())
-      .transition()
-      .duration(duration / 2)
-      .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
       .transition()
       .duration(duration)
-      .attr("y", (d) => yScale(d.minutes))
-      .attr("height", (d) => yScale(0) - yScale(d.minutes))
-      ;
+      .attr("width", xScale.bandwidth())
+      .attr("fill", (d) => colorScaleContributionCategorical(d.contribution));
   }, [data, viewBoxWidth, viewBoxHeight]);
 
   
