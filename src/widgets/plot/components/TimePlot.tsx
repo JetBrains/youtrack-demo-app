@@ -1,5 +1,5 @@
 // we only feed raw data into the component.
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { ChartDataPoint } from "../utils/types.d.ts";
 
 import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
@@ -40,6 +40,20 @@ const TimePlot = ({
   const viewBoxHeight = height > 0 ? height : 0;
   const viewBoxWidth = width > 0 ? width : 0;
 
+  // x: one band per aggregated day/week/... in the timeframe
+  const xBandValues: Date[] = useMemo(
+    () =>
+      timeDays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)).map(
+        timeAggregation.dateAggregationFunction,
+      ),
+    [timeframe.from, timeframe.to, timeAggregation],
+  );
+
+  // the scrolling area is everything right of the pinned y-axis; it must be wider than
+  // the visible area, otherwise .scroll-area has nothing to scroll
+  const visibleCanvasWidth = viewBoxWidth - margins.left - margins.right;
+  const contentWidth = Math.max(visibleCanvasWidth, union(xBandValues).size * MIN_STEP_WIDTH);
+
   useEffect(() => {
     if (!chartRef.current || !pinnedRef.current) {
         return;
@@ -67,11 +81,6 @@ const TimePlot = ({
       dateAggregationFunction,
       tickValueFormattingFunction
     } = timeAggregation
-    // x: one band per day from the first day with data until now
-    const xBandValues: Date[] = timeDays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)).map(dateAggregationFunction);
-
-    // the scrolling area is everything right of the pinned y-axis
-    const contentWidth = Math.max(canvasWidth, data.length * MIN_STEP_WIDTH);
 
     const xScale = scaleBand<Date>()
       .domain(xBandValues)
@@ -189,7 +198,7 @@ const TimePlot = ({
       // .duration(duration)
       .attr("width", xScale.bandwidth())
       .attr("fill", (d) => colorScaleContributionCategorical(d.contribution));
-  }, [data, viewBoxWidth, viewBoxHeight]);
+  }, [data, viewBoxWidth, viewBoxHeight, xBandValues, contentWidth, timeAggregation]);
 
   
   // hovering the chart + mouse wheel scrolls it horizontally, handled via d3's event binding
@@ -200,6 +209,7 @@ const TimePlot = ({
     }
 
     const area = select(el);
+    
     area.on(
       "wheel.scroll",
       function (event: WheelEvent) {
@@ -230,7 +240,6 @@ const TimePlot = ({
   }, []);
 
   const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
-  const canvasWidth = viewBoxWidth - margins.left - margins.right;
   return (
     <div className={`scrollable-canvas ${isResizing ? "resizing" : ""}`}>
       <svg
@@ -245,19 +254,18 @@ const TimePlot = ({
         />
       </svg>
       <div ref={scrollRef} className="scroll-area">
-        <svg 
+        <svg
           ref={chartRef}
-          width={canvasWidth}
-          height={viewBoxHeight - margins.top}
-          transform={`translate(0, ${margins.top})`}
+          width={contentWidth}
+          height={viewBoxHeight}
         >
-          <g
-            className="canvas"
-          />
-          <g
-            className="x axis"
-            transform={`translate(0, ${canvasHeight})`}
-          />
+          <g transform={`translate(0, ${margins.top})`}>
+            <g className="canvas" />
+            <g
+              className="x axis"
+              transform={`translate(0, ${canvasHeight})`}
+            />
+          </g>
         </svg>
       </div>
     </div>
