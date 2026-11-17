@@ -232,7 +232,7 @@ const TimePlot = ({
   const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
   const canvasWidth = viewBoxWidth - margins.left - margins.right;
   return (
-    <div className={`scrollable-bar-chart ${isResizing ? "resizing" : ""}`}>
+    <div className={`scrollable-canvas ${isResizing ? "resizing" : ""}`}>
       <svg
         ref={pinnedRef}
         className="pinned axes"

@@ -189,7 +189,7 @@ const ScrollableBarChart = ({
   }, []);
 
   return (
-    <div className={`scrollable-bar-chart ${isResizing ? "resizing" : ""}`}>
+    <div className={`scrollable-canvas ${isResizing ? "resizing" : ""}`}>
       <svg
         ref={axisRef}
         className="pinned axes"

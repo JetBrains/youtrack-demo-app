@@ -92,27 +92,21 @@ g.grid line {
 }
 
 /* scrollable hours-per-day chart: pinned y-axis + horizontally scrolling bars */
-.scrollable-bar-chart {
+.scrollable-canvas {
   display: flex;
   width: 100%;
   min-width: 0;
 }
 
-.scrollable-bar-chart .pinned-axis {
-  flex: none;
+.scrollable-canvas .pinned-axis {
   overflow: visible;
 }
 
-.scrollable-bar-chart .scroll-area {
+.scroll-area {
   flex: 1;
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-}
-
-
-.scrollable-bar-chart .scroll-area svg {
-  display: block;
 }
 
 .component {
@@ -122,7 +116,7 @@ g.grid line {
   overflow: hidden;
 }
 
-.resizing g.canvas * {
+.resizing .canvas * {
   filter: grayscale();
   opacity: 0.5;
 }
