@@ -4,18 +4,21 @@ import { ChartDataPoint } from "../utils/types";
 
 import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
-import { max, sort, union } from "d3-array";
+import { bin, extent, map, max, range, sort, union } from "d3-array";
 import { select } from "d3-selection";
-import { scaleBand, scaleLinear, scaleTime } from "d3-scale";
+import { scaleBand, scaleLinear, scaleThreshold, scaleTime } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
-import { timeDay, timeDays } from "d3-time";
+import { timeDay, timeDays, utcMinutes } from "d3-time";
 import "d3-transition";
 import { describeDataPoint } from "../utils/helper.ts";
 import { margins } from "../utils/constants.ts";
 import { TimeAggregationOption } from "../utils/classes.ts";
+import { area } from "d3";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;
+
+type Bin = { start: number; count: number };
 
 const HistogramPlot = ({
   data,
@@ -38,19 +41,29 @@ const HistogramPlot = ({
   const viewBoxHeight = height > 0 ? height : 0;
   const viewBoxWidth = width > 0 ? width : 0;
 
-  // x: one band per aggregated day/week/... in the timeframe
-  const xBandValues: Date[] = useMemo(
-    () =>
-      timeDays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)).map(
-        timeAggregation.dateAggregationFunction,
-      ),
-    [timeframe.from, timeframe.to, timeAggregation],
+  const BIN_SIZE_MINUTES = 10;
+  const maxMinutes = Math.max(
+    BIN_SIZE_MINUTES,
+    Math.ceil((max(data, (d) => d.totalMinutes) ?? 0) / BIN_SIZE_MINUTES) * BIN_SIZE_MINUTES,
   );
+
+  // one band per bin, identified by its start in minutes: 0, BIN_SIZE_MINUTES, ... maxMinutes - BIN_SIZE_MINUTES
+  const bands = useMemo(() => range(0, maxMinutes, BIN_SIZE_MINUTES), [maxMinutes]);
+
+  // number of data points falling into each band (a value equal to maxMinutes lands in the last band)
+  const bins = useMemo(() => {
+    const counts = bands.map((start) => ({ start, count: 0 }));
+    for (const d of data) {
+      const index = Math.min(Math.floor(d.totalMinutes / BIN_SIZE_MINUTES), bands.length - 1);
+      counts[index].count += 1;
+    }
+    return counts;
+  }, [data, bands]);
 
   // the scrolling area is everything right of the pinned y-axis; it must be wider than
   // the visible area, otherwise .scroll-area has nothing to scroll
   const visibleCanvasWidth = viewBoxWidth - margins.left - margins.right;
-  const contentWidth = Math.max(visibleCanvasWidth, union(xBandValues).size * MIN_STEP_WIDTH);
+  const contentWidth = Math.max(visibleCanvasWidth, bands.length * MIN_STEP_WIDTH);
 
   useEffect(() => {
     if (!chartRef.current || !pinnedRef.current) {
@@ -74,33 +87,27 @@ const HistogramPlot = ({
 
     const duration = dataChanged ? TRANSITION_MS : 0;
 
-
     const {
       dateAggregationFunction,
       tickValueFormattingFunction
     } = timeAggregation
 
-    const xScale = scaleBand<Date>()
-      .domain(xBandValues)
+
+    const xScale = scaleBand<number>()
+      .domain(bands)
       .range([0, contentWidth])
       .padding(0.2);
 
     const yScale = scaleLinear()
-      .domain([0, max(data, (d) => d.totalMinutes) as number])
+      .domain([0, max(bins, (d) => d.count) ?? 0])
       .range([canvasHeight, 0])
       .nice();
-
-    const tickValues: Set<Date> = union(xBandValues.map(dateAggregationFunction))
 
     svg
       .select<SVGGElement>(".x.axis")
       .transition()
       .duration(duration)
-      .call(
-        axisBottom(xScale)
-          .tickValues(tickValues)
-          .tickFormat(tickValueFormattingFunction)
-      );
+      .call(axisBottom(xScale));
 
     pinnedAxes
       .select<SVGGElement>(".y.axis")
@@ -111,22 +118,22 @@ const HistogramPlot = ({
     const canvas = svg.select(".canvas");
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     canvas
-      .selectAll<SVGRectElement, ChartDataPoint[]>("rect.total-minutes")
-      .data(sort(data, d => d.date), (d) => d.date)
+      .selectAll<SVGRectElement, Bin>("rect.counts")
+      .data(bins, (d) => d.start)
       .join(
         (enter) => {
             const rects = enter
                 .append("rect")
                 .attr("y", canvasHeight)
                 .attr("height", 0)
-                .attr("opacity", (d) => 0.2);
+                .attr("opacity", 0.2);
 
               rects
                 .transition()
                 .duration(duration)
                 .delay((_, i) => i * 10)
-                .attr("y", (d) => yScale(d.totalMinutes))
-                .attr("height", (d) => canvasHeight - yScale(d.totalMinutes));
+                .attr("y", (d) => yScale(d.count))
+                .attr("height", (d) => canvasHeight - yScale(d.count));
 
             rects.append("title");
             return rects;
@@ -134,58 +141,16 @@ const HistogramPlot = ({
         (update) => update
                       .transition()
                       .duration(duration)
-                      .attr("y", (d) => yScale(d.totalMinutes))
-                      .attr("height", (d) => canvasHeight - yScale(d.totalMinutes)),
+                      .attr("y", (d) => yScale(d.count))
+                      .attr("height", (d) => canvasHeight - yScale(d.count)),
 
         (exit) => exit.remove(),
       )
-      .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
+      .attr("x", (d) => xScale(d.start) ?? -xScale.bandwidth())
       .attr("width", xScale.bandwidth())
-      .attr("data-value", (d) => d.totalMinutes)
-      .attr("class", "total-minutes");
-
-    canvas
-      .selectAll<SVGRectElement, ChartDataPoint>("rect.own-contribution")
-      .data(sort(data, d => d.date), d => d.date)
-      .join(
-        (enter) => {
-            const rects = enter
-                .append("rect")
-                .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
-                .attr("y", canvasHeight)
-                .attr("height", 0);
-
-            rects                
-                .transition()
-                .duration(duration)
-                .attr("y", (d) => yScale(d.minutes))
-                .attr("height", (d) => canvasHeight - yScale(d.minutes));
-            rects.append("title");
-            return rects;
-        },
-        (update) => {
-          return update
-                    .attr("y", canvasHeight)
-                    .attr("height", 0)
-                    .transition()
-                    .duration(duration)
-                    .delay((_, i) => 100 + i * 10)
-                    .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
-                    .attr("y", (d) => yScale(d.minutes))
-                    .attr("height", (d) => canvasHeight - yScale(d.minutes));
-        },
-        (exit) => exit.remove(),
-      )
-      .attr("data-value", (d) => d.contribution)
-      .attr("class", "own-contribution")
-      .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
-      .attr("width", xScale.bandwidth())
-      .call((rects) =>
-        rects
-          .select("title")
-          .text((d) => describeDataPoint(d)),
-      );
-  }, [data, viewBoxWidth, viewBoxHeight, xBandValues, contentWidth, timeAggregation]);
+      .attr("data-value", (d) => d.count)
+      .attr("class", "counts");
+  }, [data, bins, bands, viewBoxWidth, viewBoxHeight, contentWidth, timeAggregation]);
 
   
   // hovering the chart + mouse wheel scrolls it horizontally, handled via d3's event binding

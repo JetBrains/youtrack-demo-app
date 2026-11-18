@@ -38,6 +38,7 @@ import { useResizeObserver } from "./hooks/useResizeObserver.ts";
 import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-picker.js";
 import { mockData } from "./utils/mockData.ts";
 import { timeAggregationOptions } from "./utils/constants.ts";
+import HistogramPlot from "./components/HistogramPlot.tsx";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -127,7 +128,7 @@ const AppComponent = () => {
     const { from, to } = timeframe;
     const fetchData = async () => {
       if (host === "localhost") {
-        return mockData(from, to, ["Alice", "Bob", "Charlie"], 200);
+        return mockData(from, to, ["David", "Britta", "Cinna"], 200);
       }
 
       const newHost: HostAPI = await YTApp.register();
@@ -230,10 +231,9 @@ const AppComponent = () => {
       </section>
       <section id="graph" className="component" ref={setPlotEl}>
         {(
-          <TimePlot
+          <HistogramPlot
             data={ChartData}
             timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
-            timeframe={timeframe}
             isResizing={isResizing}
             width={containerWidth}
             height={containerHeight}
