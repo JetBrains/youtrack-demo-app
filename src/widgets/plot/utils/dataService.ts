@@ -2,10 +2,9 @@ import {
     author, FetchedDataPoint
 } from "./types.d.ts";
 
-import {rollup, sort} from "d3";
+import {map, rollup, sort, union} from "d3";
 
 export const extractAllPeople = (fetchedData: FetchedDataPoint[]): author[] => {
-    const lookup = rollup(fetchedData, D => D[0].author, d => d.author.id);
-    sort(lookup, (a, b) => a[0].name - b[0].name)
-    return Array.from(lookup.values());
+    const onlyAuthors = union(map(fetchedData, d => d.author).sort((a, b) => a.name.localeCompare(b.name)))
+    return Array.from(onlyAuthors.values());
 };
