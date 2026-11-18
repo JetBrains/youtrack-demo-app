@@ -44,17 +44,17 @@ const HistogramPlot = ({
   const BIN_SIZE_MINUTES = 10;
   const maxMinutes = Math.max(
     BIN_SIZE_MINUTES,
-    Math.ceil((max(data, (d) => d.totalMinutes) ?? 0) / BIN_SIZE_MINUTES) * BIN_SIZE_MINUTES,
+    Math.ceil((max(data.values(), (d) => d[1]) ?? 0) / BIN_SIZE_MINUTES) * BIN_SIZE_MINUTES,
   );
 
   // one band per bin, identified by its start in minutes: 0, BIN_SIZE_MINUTES, ... maxMinutes - BIN_SIZE_MINUTES
   const bands = useMemo(() => range(0, maxMinutes, BIN_SIZE_MINUTES), [maxMinutes]);
-
+  console.log(map(data.values(), d => d.values()))
   // number of data points falling into each band (a value equal to maxMinutes lands in the last band)
   const bins = useMemo(() => {
     const counts = bands.map((start) => ({ start, count: 0 }));
     for (const d of data) {
-      const index = Math.min(Math.floor(d.totalMinutes / BIN_SIZE_MINUTES), bands.length - 1);
+      const index = Math.min(Math.floor(d.minutes / BIN_SIZE_MINUTES), bands.length - 1);
       counts[index].count += 1;
     }
     return counts;

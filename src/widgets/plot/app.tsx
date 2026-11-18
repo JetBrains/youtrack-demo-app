@@ -39,6 +39,7 @@ import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-pic
 import { mockData } from "./utils/mockData.ts";
 import { timeAggregationOptions } from "./utils/constants.ts";
 import HistogramPlot from "./components/HistogramPlot.tsx";
+import { rollup, sum } from "d3";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -123,6 +124,7 @@ const AppComponent = () => {
   const [selectedPerson, setSelectedPerson] = useState<string>("");
 
   const [ChartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [histogramChartData, setHistogramChartData] = useState([]);
 
   const loadData = async () => {
     const { from, to } = timeframe;
@@ -166,6 +168,13 @@ const AppComponent = () => {
     }
 
     const groupingFunction = timeAggregationOptions.get(selectedTimeAggregationKey)!.dateAggregationFunction;
+    const minutesByPersonAndTimeframe = rollup(extractedDataPoints,
+      D => sum(D.map(d => d.minutes)),
+      d => d.authorId,
+      d => groupingFunction(d.date)
+    )
+    setHistogramChartData(minutesByPersonAndTimeframe)
+
     const povData = evaluateFromPOV(
         selectedPerson,
         extractedDataPoints,
@@ -232,7 +241,7 @@ const AppComponent = () => {
       <section id="graph" className="component" ref={setPlotEl}>
         {(
           <HistogramPlot
-            data={ChartData}
+            data={histogramChartData}
             timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
             isResizing={isResizing}
             width={containerWidth}
