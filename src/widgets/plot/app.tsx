@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { memo, useEffect, useState } from "react";
 
 import type { EmbeddableWidgetAPI, HostAPI } from "../../../@types/globals";

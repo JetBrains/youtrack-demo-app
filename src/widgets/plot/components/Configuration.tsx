@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { memo, useState } from 'react';
 import Input from '@jetbrains/ring-ui-built/components/input/input';
 import Button from '@jetbrains/ring-ui-built/components/button/button';

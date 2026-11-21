@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Total hours per day. Bars keep a fixed width, so a long range scrolls horizontally
 // while the y-axis stays pinned in its own svg.
 import { useRef, useEffect } from "react";

@@ -43,6 +43,8 @@ export default tseslint.config(
                 { allowConstantExport: true },
             ],
             "react/jsx-no-literals": "off",
+            "react/react-in-jsx-scope": "off",
+            "react/prop-types": "off",
             'max-len': [
                 'error',
                 {
@@ -57,10 +59,18 @@ export default tseslint.config(
     },
     {
         files: ["src/*.js"],
+        rules: {
+            "@typescript-eslint/no-require-imports": "off",
+            "@typescript-eslint/no-unused-vars": "off",
+        },
         languageOptions: {
             globals: {
                 ...globals.node,
             }
         }
-    }
+    },
+    {
+        files: ['src/widgets/plot/utils/mockData.ts'],
+        rules: { 'no-magic-numbers': 'off' },
+    },
 );
