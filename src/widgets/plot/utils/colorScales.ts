@@ -34,4 +34,5 @@ const constructContributionCategoryColour = (labels: string[]) => {
     return new InternMap(pairs)
 }
 
-export const contributionCategoryColour: InternMap<string, string> = constructContributionCategoryColour(contributionLabels.en);
+export const contributionCategoryColour: InternMap<string, string> =
+    constructContributionCategoryColour(contributionLabels.en);

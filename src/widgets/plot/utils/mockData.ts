@@ -35,7 +35,12 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
  * across the days from startDate to endDate (inclusive).
  * Each author name maps to exactly one author object, reused across all generated items.
  */
-export const mockData = (startDate: Date, endDate: Date, authorNames: string[], amountOfWorklogs: number): FetchedDataPoint[] => {
+export const mockData = (
+    startDate: Date,
+    endDate: Date,
+    authorNames: string[],
+    amountOfWorklogs: number,
+): FetchedDataPoint[] => {
     const authors: author[] = authorNames.map(createAuthor);
     if (authors.length === 0 || amountOfWorklogs <= 0) {return [];}
 

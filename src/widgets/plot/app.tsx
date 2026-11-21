@@ -12,7 +12,7 @@ import { extractAllPeople } from "./utils/dataService.ts";
 import { evaluateFromPOV, extractRelevantInfo } from "./utils/processingData.ts";
 import ButtonGroup from "@jetbrains/ring-ui-built/components/button-group/button-group";
 import Button from "@jetbrains/ring-ui-built/components/button/button";
-import {
+import type {
   author,
   ExtractedDataPoint,
   ChartDataPoint,
@@ -20,13 +20,10 @@ import {
 } from "./utils/types.d.ts";
 import ButtonToolbar from "@jetbrains/ring-ui-built/components/button-toolbar/button-toolbar";
 import TimePlot from "./components/TimePlot.tsx";
-import ScrollableBarChart from "./components/ScrollableBarChart.tsx";
 import { useResizeObserver } from "./hooks/useResizeObserver.ts";
 import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-picker.js";
 import { mockData } from "./utils/mockData.ts";
 import { timeAggregationOptions } from "./utils/constants.ts";
-import HistogramPlot from "./components/HistogramPlot.tsx";
-import { rollup, sum } from "d3";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -58,20 +55,20 @@ const AppComponent = () => {
   };
 
   const readConfig = async () => {
-    const host = await YTApp.register()
-    if (!("readConfig" in host)) {
+    const registeredHost = await YTApp.register()
+    if (!("readConfig" in registeredHost)) {
       console.error("no readconfig method in host! Check extension type")
       return;
     }
 
     try {
-      const loadedConfig = await host.readConfig<WidgetConfiguration>();
+      const loadedConfig = await registeredHost.readConfig<WidgetConfiguration>();
       console.info("loaded config", loadedConfig);
       if (loadedConfig) {
         // if config is sufficient
         setConfig(loadedConfig);
       } else {
-        await host.enterConfigMode();
+        await registeredHost.enterConfigMode();
         setIsConfiguring(true);
       }
     } catch (e) {
@@ -82,11 +79,11 @@ const AppComponent = () => {
   const doneConfiguring = async (newConfig?: WidgetConfiguration) => {
     try {
       if (newConfig) {
-        await host.storeConfig(newConfig);
+        await (host as EmbeddableWidgetAPI).storeConfig(newConfig);
         setConfig(newConfig);
       }
       setIsConfiguring(false);
-      await host.exitConfigMode();
+      await (host as EmbeddableWidgetAPI).exitConfigMode();
     } catch (e) {
       console.error("Failed to store config / exit config mode", e);
       return;
@@ -111,7 +108,6 @@ const AppComponent = () => {
   const [selectedPerson, setSelectedPerson] = useState<string>("");
 
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [histogramChartData, setHistogramChartData] = useState([]);
 
   const loadData = async () => {
     const { from, to } = timeframe;
@@ -128,21 +124,21 @@ const AppComponent = () => {
       const startDate = from.toISOString().split("T")[0];
       const endDate = to.toISOString().split("T")[0];
 
-      return await newHost.fetchYouTrack(
+      return await newHost.fetchYouTrack<FetchedDataPoint[]>(
         `workItems?startDate=${startDate}&endDate=${endDate}&fields=${fields}&query=${query}`,
       );
     };
 
     const fetchedData: FetchedDataPoint[] = await fetchData();
-    const authors = extractAllPeople(fetchedData);
-    setAuthors(authors);
+    const allAuthors = extractAllPeople(fetchedData);
+    setAuthors(allAuthors);
 
-    if (authors.length) {
-      setSelectedPerson(authors[0].id);
+    if (allAuthors.length) {
+      setSelectedPerson(allAuthors[0].id);
     }
-    const extractedDataPoints: ExtractedDataPoint[] =
+    const newDataPoints: ExtractedDataPoint[] =
       extractRelevantInfo(fetchedData);
-    setExtractedDataPoints(extractedDataPoints);
+    setExtractedDataPoints(newDataPoints);
   };
 
   useEffect(() => {
@@ -155,12 +151,6 @@ const AppComponent = () => {
     }
 
     const groupingFunction = timeAggregationOptions.get(selectedTimeAggregationKey)!.dateAggregationFunction;
-    const minutesByPersonAndTimeframe = rollup(extractedDataPoints,
-      D => sum(D.map(d => d.minutes)),
-      d => d.authorId,
-      d => groupingFunction(d.date)
-    )
-    setHistogramChartData(minutesByPersonAndTimeframe)
 
     const povData = evaluateFromPOV(
         selectedPerson,
@@ -184,14 +174,14 @@ const AppComponent = () => {
       <section id="header" className="component">
         <ButtonToolbar>
           <ButtonGroup>
-            {authors.map((author) => {
+            {authors.map((person) => {
               return (
                 <Button
-                  key={author.id}
-                  active={author.id === selectedPerson}
-                  onClick={() => setSelectedPerson(author.id)}
+                  key={person.id}
+                  active={person.id === selectedPerson}
+                  onClick={() => setSelectedPerson(person.id)}
                 >
-                  {author.name}
+                  {person.name}
                 </Button>
               );
             })}
@@ -222,18 +212,22 @@ const AppComponent = () => {
             clear
             from={timeframe.from}
             maxDate={new Date().toDateString()}
-            onChange={(event) => setTimeframe(event)}
+            onChange={({ from, to }: { from?: Date | null; to?: Date | null }) => {
+              if (from && to) {
+                setTimeframe({ from, to });
+              }
+            }}
             range
             to={timeframe.to}
           />
         </ButtonToolbar>
       </section>
-      <section id="graph" className="component" ref={setPlotEl}>
+      <section id="graph" className="component" ref={(el: HTMLElement | null) => setPlotEl(el as HTMLDivElement | null)}>
         {(
           <TimePlot
             data={chartData}
             timeframe={timeframe}
-            timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
+            timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)!}
             isResizing={isResizing}
             width={containerWidth}
             height={containerHeight}

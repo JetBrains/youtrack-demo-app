@@ -166,7 +166,7 @@ const HistogramPlot = ({
     
     area.on(
       "wheel.scroll",
-      function (event: WheelEvent) {
+      function wheelScroll(event: WheelEvent) {
         const node = this as HTMLDivElement;
         const maxScroll = node.scrollWidth - node.clientWidth;
         if (maxScroll <= 0) {

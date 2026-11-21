@@ -2,7 +2,7 @@
 // Total hours per day. Bars keep a fixed width, so a long range scrolls horizontally
 // while the y-axis stays pinned in its own svg.
 import { useRef, useEffect } from "react";
-import { ChartDataPoint } from "../utils/types.d.ts";
+import type { ChartDataPoint } from "../utils/types.d.ts";
 
 import { max } from "d3-array";
 import { select } from "d3-selection";
@@ -72,7 +72,7 @@ const ScrollableBarChart = ({
     const days = data.map((d) => d.date.getTime());
     const canvasWidth = contentWidth - margins.right;
 
-    const thresholdScale = scaleThreshold([0, 0.5, 1], ["blue", "green", "orange", "red"])
+    const thresholdScale = scaleThreshold<number, string>([0, 0.5, 1], ["blue", "green", "orange", "red"])
 
     const xScale = scaleBand<number>()
       .domain(days)
@@ -162,7 +162,7 @@ const ScrollableBarChart = ({
     const area = select(el);
     area.on(
       "wheel.scroll",
-      function (event: WheelEvent) {
+      function wheelScroll(event: WheelEvent) {
         const node = this as HTMLDivElement;
         const maxScroll = node.scrollWidth - node.clientWidth;
         if (maxScroll <= 0) {

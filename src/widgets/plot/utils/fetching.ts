@@ -19,7 +19,7 @@ export const fetchWorkItems = async (
         const startDate = from.toISOString().split("T")[0];
         const endDate = to.toISOString().split("T")[0];
         return await host.fetchYouTrack<FetchedDataPoint[]>(`workItems?startDate=${startDate}&endDate=${endDate}&fields=${fields}&query=${query}`);
-    } catch (error) {
+    } catch {
         host.alert('YTApp: could not request custom HTTP endpoint', 'error' as AlertType.ERROR)
         return []
     }

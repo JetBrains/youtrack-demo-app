@@ -33,6 +33,9 @@ export const toHoursAndMinutes = (totalMinutes: number) => ({
     minutes: totalMinutes % 60,
 });
 
+export const formatMinutesAsHoursAndMinutes = (totalMinutes: number) =>
+    formatDuration(toHoursAndMinutes(totalMinutes), { zero: false }) || "0 minutes"
+
 export const describeDataPoint = (d: ChartDataPoint) => {
     const dateString = `${d.date.toLocaleDateString([], { day: "numeric", month: "short", year: "numeric", weekday: "short" })}`
     if (d.totalMinutes === 0) {

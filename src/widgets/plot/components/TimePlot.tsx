@@ -1,6 +1,6 @@
 // we only feed raw data into the component.
 import { useRef, useEffect, useMemo } from "react";
-import { ChartDataPoint } from "../utils/types.d.ts";
+import type { ChartDataPoint } from "../utils/types.d.ts";
 
 import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
@@ -113,15 +113,15 @@ const TimePlot = ({
     const canvas = svg.select(".canvas");
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     canvas
-      .selectAll<SVGRectElement, ChartDataPoint[]>("rect.total-minutes")
-      .data(sort(data, d => d.date), (d) => d.date)
+      .selectAll<SVGRectElement, ChartDataPoint>("rect.total-minutes")
+      .data(sort(data, d => d.date), (d) => d.date.getTime())
       .join(
         (enter) => {
             const rects = enter
                 .append("rect")
                 .attr("y", canvasHeight)
                 .attr("height", 0)
-                .attr("opacity", (d) => 0.2);
+                .attr("opacity", () => 0.2);
 
               rects
                 .transition()
@@ -148,7 +148,7 @@ const TimePlot = ({
 
     canvas
       .selectAll<SVGRectElement, ChartDataPoint>("rect.own-contribution")
-      .data(sort(data, d => d.date), d => d.date)
+      .data(sort(data, d => d.date), d => d.date.getTime())
       .join(
         (enter) => {
             const rects = enter
@@ -201,7 +201,7 @@ const TimePlot = ({
     
     area.on(
       "wheel.scroll",
-      function (event: WheelEvent) {
+      function wheelScroll(event: WheelEvent) {
         const node = this as HTMLDivElement;
         const maxScroll = node.scrollWidth - node.clientWidth;
         if (maxScroll <= 0) {

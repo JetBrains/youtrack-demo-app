@@ -5,7 +5,11 @@ import { compareContributionToRest, formatMinutesAsHoursAndMinutes } from "../ut
 
 import type {ChartDataPoint} from "../utils/types";
 
-const TimePlotSummary = ( { timeframe, data, contributingPeopleCount } ) => {
+const TimePlotSummary = ( { timeframe, data, contributingPeopleCount }: {
+    timeframe: { from: Date, to: Date },
+    data: ChartDataPoint[],
+    contributingPeopleCount: number
+} ) => {
     const dayCount = differenceInDays(timeframe.from, timeframe.to)
     const anyContributionDayCount = rollup(
         data,
@@ -19,7 +23,7 @@ const TimePlotSummary = ( { timeframe, data, contributingPeopleCount } ) => {
         (d: ChartDataPoint) => d.minutes > 0
     )
 
-    const daysWithOwnContributionPercent = ownContributionDayCount.has(true) ? ownContributionDayCount.get(true)?.length / dayCount * 100 : 0
+    const daysWithOwnContributionPercent = ownContributionDayCount.has(true) ? (ownContributionDayCount.get(true)?.length ?? 0) / dayCount * 100 : 0
 
     const durationContribution = sum(data, (d: ChartDataPoint) => d.minutes)
     const durationAverageContribution = contributingPeopleCount ?
