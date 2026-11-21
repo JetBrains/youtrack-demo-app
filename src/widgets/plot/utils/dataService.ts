@@ -2,7 +2,7 @@ import type {
     author, FetchedDataPoint
 } from "./types.d.ts";
 
-import {map, rollup, sort, union} from "d3";
+
 
 export const extractAllPeople = (fetchedData: FetchedDataPoint[]): author[] => {
     const byLogin = new Map<string, author>();

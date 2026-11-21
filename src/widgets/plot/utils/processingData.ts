@@ -1,10 +1,10 @@
 import type {FetchedDataPoint, ExtractedDataPoint, ChartDataPoint} from "./types.d.ts";
 import {timeDay} from "d3-time";
-import {group, rollup, sum, union} from "d3-array";
+import { rollup, sum, union } from "d3-array";
 import {compareContributionToRest} from "./helper.ts";
 import {contributionLabelScale} from "./colorScales.ts";
 import {contributionLabels} from "./constants.ts";
-import { timeFormat } from "d3";
+
 
 export const extractRelevantInfo = (fetchedData: FetchedDataPoint[]): ExtractedDataPoint[] => fetchedData.map(d => {
     const date = timeDay.floor(new Date(d.date));

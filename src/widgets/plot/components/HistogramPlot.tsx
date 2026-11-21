@@ -2,18 +2,18 @@
 import { useRef, useEffect, useMemo } from "react";
 import { ChartDataPoint } from "../utils/types";
 
-import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
-import { bin, extent, map, max, range, sort, union } from "d3-array";
+
+import { max, range } from "d3-array";
 import { select } from "d3-selection";
-import { scaleBand, scaleLinear, scaleThreshold, scaleTime } from "d3-scale";
+import { scaleBand, scaleLinear } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
-import { timeDay, timeDays, utcMinutes } from "d3-time";
+
 import "d3-transition";
-import { describeDataPoint } from "../utils/helper.ts";
+
 import { margins } from "../utils/constants.ts";
 import { TimeAggregationOption } from "../utils/classes.ts";
-import { area } from "d3";
+
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;

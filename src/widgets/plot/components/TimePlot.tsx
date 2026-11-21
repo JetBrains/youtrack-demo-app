@@ -6,7 +6,7 @@ import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
 
 import { max, sort, union } from "d3-array";
 import { select } from "d3-selection";
-import { scaleBand, scaleLinear, scaleTime } from "d3-scale";
+import { scaleBand, scaleLinear } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
 import { timeDay, timeDays } from "d3-time";
 import "d3-transition";

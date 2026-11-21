@@ -1,14 +1,4 @@
-import {
-    InternMap,
-    union,
-    timeMonday,
-    timeMondays,
-    timeDays,
-    timeDay,
-    scaleThreshold,
-    scaleDiverging,
-    range, scaleQuantize, interpolateArray, interpolateBasis
-} from "d3"
+import { InternMap, union, timeMonday, timeMondays, timeDays, timeDay } from "d3";
 import type {ChartDataPoint} from "./types.d.ts";
 import {formatDuration} from "date-fns/formatDuration";
 import {contributionLabelScale} from "./colorScales.ts";

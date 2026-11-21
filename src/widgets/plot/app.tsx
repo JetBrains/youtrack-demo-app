@@ -1,28 +1,14 @@
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { timeDay, timeMonday, timeMonth } from "d3-time";
+import React, { memo, useEffect, useState } from "react";
+
 import type { EmbeddableWidgetAPI, HostAPI } from "../../../@types/globals";
 import { Configuration } from "./components/Configuration.tsx";
 import type { WidgetConfiguration } from "./utils/types.d.ts";
 import "@jetbrains/ring-ui-built/components/style.css";
 import "./app.css";
 import { sub } from "date-fns";
-import {
-  ControlsHeight,
-  ControlsHeightContext,
-} from "@jetbrains/ring-ui-built/components/global/controls-height";
+
 import { extractAllPeople } from "./utils/dataService.ts";
-import {
-  evaluateFromPOV,
-  extractRelevantInfo,
-  getCategorySummary,
-} from "./utils/processingData.ts";
+import { evaluateFromPOV, extractRelevantInfo } from "./utils/processingData.ts";
 import ButtonGroup from "@jetbrains/ring-ui-built/components/button-group/button-group";
 import Button from "@jetbrains/ring-ui-built/components/button/button";
 import {
