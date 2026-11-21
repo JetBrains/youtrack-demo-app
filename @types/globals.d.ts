@@ -57,7 +57,7 @@ export interface PluginEndpointAPILayer extends InstanceAwareAPILayer {
  * This layer is only available for MARKDOWN and DASHBOARD_WIDGET extension points
  */
 export interface EmbeddableWidgetAPI extends PluginEndpointAPILayer {
-  setTitle: (label: string, labelUrl: string) => Promise<void>;
+  setTitle: (label: string) => Promise<void>;
   setLoadingAnimationEnabled: (isEnabled: boolean) => Promise<void>;
 
   enterConfigMode: () => Promise<void>;

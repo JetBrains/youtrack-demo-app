@@ -37,7 +37,15 @@ const AppComponent = () => {
 
   const [config, setConfig] = useState<WidgetConfiguration>();
 
+  const isLocalhost = window.location.hostname === "localhost";
+
   const register = async () => {
+    if (isLocalhost) {
+      // running outside of YouTrack (vite dev server): no Host API available, use mock data
+      console.info("running on localhost, skipping YouTrack registration");
+      setHost("localhost");
+      return;
+    }
     console.info("trying to register")
     try {
       const newHost = await YTApp.register({
@@ -55,6 +63,7 @@ const AppComponent = () => {
   };
 
   const readConfig = async () => {
+    if (isLocalhost) return;
     const registeredHost = await YTApp.register()
     if (!("readConfig" in registeredHost)) {
       console.error("no readconfig method in host! Check extension type")
@@ -67,6 +76,8 @@ const AppComponent = () => {
       if (loadedConfig) {
         // if config is sufficient
         setConfig(loadedConfig);
+        if ("setTitle" in registeredHost)
+          await registeredHost.setTitle(loadedConfig.title);
       } else {
         await registeredHost.enterConfigMode();
         setIsConfiguring(true);
@@ -78,6 +89,11 @@ const AppComponent = () => {
 
   const doneConfiguring = async (newConfig?: WidgetConfiguration) => {
     try {
+      if (host === "localhost") {
+        if (newConfig) setConfig(newConfig);
+        setIsConfiguring(false);
+        return;
+      }
       if (newConfig) {
         await (host as EmbeddableWidgetAPI).storeConfig(newConfig);
         setConfig(newConfig);
@@ -96,7 +112,7 @@ const AppComponent = () => {
   }, []);
 
   const [timeframe, setTimeframe] = useState<{ from: Date; to: Date }>({
-    from: sub(new Date(), { months: 6 }),
+    from: sub(new Date(), { months: 3 }),
     to: new Date(),
   });
   const [selectedTimeAggregationKey, setSelectedTimeAggregationKey] = useState<string>("week")
@@ -112,7 +128,7 @@ const AppComponent = () => {
   const loadData = async () => {
     const { from, to } = timeframe;
     const fetchData = async () => {
-      if (host === "localhost") {
+      if (isLocalhost) {
         return mockData(from, to, ["David", "Britta", "Cinna"], 200);
       }
 
@@ -187,7 +203,7 @@ const AppComponent = () => {
             })}
           </ButtonGroup>
 
-          <Button onClick={() => loadData()}>Refresh Data</Button>
+          {/*<Button onClick={() => loadData()}>Refresh Data</Button>*/}
 
           <ButtonGroup>
             {Array.from(timeAggregationOptions.keys()).map((key) => {
@@ -205,7 +221,7 @@ const AppComponent = () => {
           </ButtonGroup>
 
           <Button onClick={() => setIsConfiguring(!isConfiguring)}>
-            Toggle Config
+            Configure
           </Button>
 
           <DatePicker
