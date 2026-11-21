@@ -21,10 +21,10 @@ export const colorScaleContributionCategorical = scaleThreshold(
 const constructContributionLabelScale = (labels: string[]) => {
     // without borders
     const bandCount = labels.length;
-    const thresholds: number[] = Array(bandCount).fill(0).map((_, idx) => (idx / bandCount));
+    // n labels need n - 1 thresholds (scaleThreshold's range has one more entry than its domain)
+    const thresholds: number[] = Array(bandCount - 1).fill(0).map((_, idx) => ((idx + 1) / bandCount));
     return scaleThreshold(thresholds, labels);
 }
-
 
 export const contributionLabelScale = constructContributionLabelScale(contributionLabels.en)
 
