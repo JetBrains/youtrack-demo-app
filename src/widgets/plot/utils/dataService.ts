@@ -1,4 +1,4 @@
-import {
+import type {
     author, FetchedDataPoint
 } from "./types.d.ts";
 

@@ -1,4 +1,4 @@
-import {FetchedDataPoint, ExtractedDataPoint, ChartDataPoint} from "./types.d.ts";
+import type {FetchedDataPoint, ExtractedDataPoint, ChartDataPoint} from "./types.d.ts";
 import {timeDay} from "d3-time";
 import {group, rollup, sum, union} from "d3-array";
 import {compareContributionToRest} from "./helper.ts";

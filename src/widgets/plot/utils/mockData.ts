@@ -1,4 +1,4 @@
-import {author, FetchedDataPoint} from "./types.d.ts";
+import type {author, FetchedDataPoint} from "./types.d.ts";
 
 const ULID_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 

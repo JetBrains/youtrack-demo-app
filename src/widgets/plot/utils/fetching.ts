@@ -1,7 +1,6 @@
 import { HostAPI } from "../../../../@types/globals";
 import {AlertType} from "@jetbrains/ring-ui-built/components/alert/alert";
 import {mockData} from "./mockData.ts";
-import {MOCK_AUTHORS, MOCK_WORKLOG_COUNT} from "./constants.ts";
 import type {FetchedDataPoint} from "./types.d.ts";
 
 export const fetchWorkItems = async (
@@ -12,7 +11,7 @@ export const fetchWorkItems = async (
 ): Promise<FetchedDataPoint[]> => {
     // No YouTrack host (e.g. `npm run dev`): use mock data in dev, nothing in production
     if (!host) {
-        return import.meta.env.DEV ? mockData(from, to, MOCK_AUTHORS, MOCK_WORKLOG_COUNT) : [];
+        return import.meta.env.DEV ? mockData(from, to, ["Alice", "Bob", "Charlie"], 500) : [];
     }
 
     try {

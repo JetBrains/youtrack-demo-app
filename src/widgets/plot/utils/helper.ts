@@ -9,7 +9,7 @@ import {
     scaleDiverging,
     range, scaleQuantize, interpolateArray, interpolateBasis
 } from "d3"
-import {ChartDataPoint} from "./types.d.ts";
+import type {ChartDataPoint} from "./types.d.ts";
 import {formatDuration} from "date-fns/formatDuration";
 import {contributionLabelScale} from "./colorScales.ts";
 import type {HostAPI} from "../../../../@types/globals";
