@@ -50,14 +50,11 @@ const AppComponent = () => {
   } = useResizeObserver(plotEl);
   const [host, setHost] = useState<EmbeddableWidgetAPI | "localhost">();
   const [isConfiguring, setIsConfiguring] = useState<boolean>(false);
-  const [config, setConfig] = useState<WidgetConfiguration>({ name: "" });
+
+  const [config, setConfig] = useState<WidgetConfiguration>();
 
   const register = async () => {
     console.info("trying to register")
-    // if (host === "localhost") {
-    //   return;
-    // }
-
     try {
       const newHost = await YTApp.register({
         onConfigure: () => setIsConfiguring(true),
@@ -82,6 +79,7 @@ const AppComponent = () => {
 
     try {
       const loadedConfig = await host.readConfig<WidgetConfiguration>();
+      console.info("loaded config", loadedConfig);
       if (loadedConfig) {
         // if config is sufficient
         setConfig(loadedConfig);
@@ -94,23 +92,12 @@ const AppComponent = () => {
     }
   };
 
-  const storeConfig = async (newConfig?: WidgetConfiguration) => {
-    if (newConfig) {
-      if (host !== "localhost") {
-        await host.storeConfig(newConfig);
-      }
-      setConfig(newConfig);
-    }
-
-    if (host !== "localhost") {
-      await host.exitConfigMode();
-    }
-  };
-
   const doneConfiguring = async (newConfig?: WidgetConfiguration) => {
     try {
-      await host.storeConfig(newConfig);
-      setConfig(newConfig);
+      if (newConfig) {
+        await host.storeConfig(newConfig);
+        setConfig(newConfig);
+      }
       setIsConfiguring(false);
       await host.exitConfigMode();
     } catch (e) {
@@ -121,7 +108,7 @@ const AppComponent = () => {
 
   useEffect(() => {
     register()
-        // .then(() => readConfig());
+        .then(() => readConfig());
   }, []);
 
   const [timeframe, setTimeframe] = useState<{ from: Date; to: Date }>({
@@ -148,7 +135,7 @@ const AppComponent = () => {
 
       const newHost: HostAPI = await YTApp.register();
       // define which fields you need
-      const query = "Subtask of: TODO-380";
+      const query = encodeURIComponent(config?.query ?? "");
       const fields =
         "id,author(id,name,login),duration(minutes),date,text,issue(id,customFields(id,name,value(id,name)))";
       const startDate = from.toISOString().split("T")[0];
@@ -173,7 +160,7 @@ const AppComponent = () => {
 
   useEffect(() => {
     loadData();
-  }, [timeframe]);
+  }, [timeframe, config?.query]);
 
   useEffect(() => {
     if (extractedDataPoints.length === 0) {
@@ -199,8 +186,8 @@ const AppComponent = () => {
   if (isConfiguring) {
     return (
       <Configuration
-          onDone={doneConfiguring}
-          initialName={config?.name}
+        onDone={doneConfiguring}
+        currentConfiguration={config}
       />
     );
   }
@@ -257,12 +244,12 @@ const AppComponent = () => {
       <section id="graph" className="component" ref={setPlotEl}>
         {(
           <TimePlot
-              data={chartData}
-              timeframe={timeframe}
-              timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
-              isResizing={isResizing}
-              width={containerWidth}
-              height={containerHeight}
+            data={chartData}
+            timeframe={timeframe}
+            timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
+            isResizing={isResizing}
+            width={containerWidth}
+            height={containerHeight}
           />
         )}
       </section>

@@ -1,7 +1,7 @@
-import { TimeInterval } from "d3";
 
 export type WidgetConfiguration = {
-    name: string;
+    title: string;
+    query: string;
 }
 
 export type author = {

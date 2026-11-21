@@ -2,12 +2,12 @@
   "title": "Contribution Plot Settings",
   "type": "object",
   "properties": {
-    "name": {
-      "title": "Your name",
+    "title": {
+      "title": "Set the widget Title",
       "type": "string"
     },
     "query": {
-      "title": "The search query",
+      "title": "Enter a search query",
       "type": "string"
     }
   }

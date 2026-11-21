@@ -6,35 +6,50 @@ import type {WidgetConfiguration} from '../utils/types.d.ts';
 
 interface Props {
     onDone: (config?: WidgetConfiguration) => void;
-    initialName?: string;
+    currentConfiguration?: WidgetConfiguration;
 }
 
-const ConfigurationComponent: React.FunctionComponent<Props> = ({onDone, initialName = ''}) => {
-    const [name, setName] = useState(initialName);
-    const trimmedName = name.trim();
+const ConfigurationComponent: React.FunctionComponent<Props> = ({onDone,  currentConfiguration }) => {
+    const [config, setConfig] = useState<WidgetConfiguration>({
+        title: currentConfiguration?.title ?? '',
+        query: currentConfiguration?.query ?? ''
+    });
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
+        setConfig({
+            ...config,
+            [e.target.name]: e.target.value
+        });
     }
 
     const onSubmit = (e?: React.SyntheticEvent) => {
         console.info("submitting start")
         e?.preventDefault();
         console.info("submitting after prevent default")
-        if (!trimmedName) {
-            return;
-        }
-        onDone({name: trimmedName});
+        onDone(config);
     }
 
     return (
       <form className="ring-form" onSubmit={onSubmit}>
         <span className="ring-form__title">{'Widget configuration'}</span>
 
-        <Input label="Your name" value={name} onChange={onChange} autoFocus/>
+        <Input
+          label="Widget Title"
+          name="title"
+          value={config.title}
+          onChange={onChange}
+          autoFocus
+        />
+
+        <Input
+          label="query"
+          name="query"
+          value={config.query}
+          onChange={onChange}
+        />
 
         <ButtonSet className="config-buttons">
-          <Button primary onClick={onSubmit} disabled={!trimmedName}>{'Save'}</Button>
+          <Button primary onClick={onSubmit} disabled={false}>{'Save'}</Button>
           <Button onClick={() => onDone()}>{'Cancel'}</Button>
         </ButtonSet>
       </form>

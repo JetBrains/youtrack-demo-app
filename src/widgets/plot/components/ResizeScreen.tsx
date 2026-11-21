@@ -4,7 +4,7 @@ type ResizeScreenProps = {
 
 const ResizeScreen = ({ message }: ResizeScreenProps) => {
     return (
-        <p>{message}</p>
+      <p>{message}</p>
     )
 }
 

@@ -27,10 +27,10 @@ const TimePlotSummary = ( { timeframe, data, contributingPeopleCount } ) => {
         : 0
     const contributionGrade = compareContributionToRest([durationContribution, durationAverageContribution])
     return (
-        <Text size={Text.Size.M}>
-            {/* You contributed on {ownContributionDayCount.get(true)?.length} across the {dayCount} shown days ({daysWithOwnContributionPercent.toFixed(1)}%). */}
-            You contributed {(contributionGrade)}, {formatMinutesAsHoursAndMinutes(durationContribution)} out of {formatMinutesAsHoursAndMinutes(sum(data, d => d.totalMinutes))}.
-        </Text>
+      <Text size={Text.Size.M}>
+        {/* You contributed on {ownContributionDayCount.get(true)?.length} across the {dayCount} shown days ({daysWithOwnContributionPercent.toFixed(1)}%). */}
+        You contributed {(contributionGrade)}, {formatMinutesAsHoursAndMinutes(durationContribution)} out of {formatMinutesAsHoursAndMinutes(sum(data, d => d.totalMinutes))}.
+      </Text>
     )
 }
 

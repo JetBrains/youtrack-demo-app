@@ -249,7 +249,7 @@ const TimePlot = ({
           height={viewBoxHeight}
         >
           <g transform={`translate(0, ${margins.top})`}>
-            <g className="canvas" />
+            <g className="canvas"/>
             <g
               className="x axis"
               transform={`translate(0, ${canvasHeight})`}
