@@ -48,21 +48,21 @@ const AppComponent = () => {
     height: containerHeight,
     isResizing,
   } = useResizeObserver(plotEl);
-  const [host, setHost] = useState<EmbeddableWidgetAPI | "localhost">(
-    "localhost",
-  );
+  const [host, setHost] = useState<EmbeddableWidgetAPI | "localhost">();
   const [isConfiguring, setIsConfiguring] = useState<boolean>(false);
   const [config, setConfig] = useState<WidgetConfiguration>({ name: "" });
 
   const register = async () => {
-    if (host === "localhost") {
-      return;
-    }
+    console.info("trying to register")
+    // if (host === "localhost") {
+    //   return;
+    // }
 
     try {
       const newHost = await YTApp.register({
         onConfigure: () => setIsConfiguring(true),
       });
+
       if (!("readConfig" in newHost)) {
         console.error("no readconfig method in host! Check extension type")
         return;
@@ -74,17 +74,23 @@ const AppComponent = () => {
   };
 
   const readConfig = async () => {
-    if (host === "localhost") {
+    const host = await YTApp.register()
+    if (!("readConfig" in host)) {
+      console.error("no readconfig method in host! Check extension type")
       return;
     }
 
-    const loadedConfig = await host.readConfig<WidgetConfiguration>();
-    if (loadedConfig) {
-      // if config is sufficient
-      setConfig(loadedConfig);
-    } else {
-      await host.enterConfigMode();
-      setIsConfiguring(true);
+    try {
+      const loadedConfig = await host.readConfig<WidgetConfiguration>();
+      if (loadedConfig) {
+        // if config is sufficient
+        setConfig(loadedConfig);
+      } else {
+        await host.enterConfigMode();
+        setIsConfiguring(true);
+      }
+    } catch (e) {
+      console.error("Could not read config from host", e);
     }
   };
 
@@ -101,14 +107,21 @@ const AppComponent = () => {
     }
   };
 
-  const doneConfiguring = (newConfig?: WidgetConfiguration) => {
-    storeConfig(newConfig)
-    setIsConfiguring(false);
-  }
+  const doneConfiguring = async (newConfig?: WidgetConfiguration) => {
+    try {
+      await host.storeConfig(newConfig);
+      setConfig(newConfig);
+      setIsConfiguring(false);
+      await host.exitConfigMode();
+    } catch (e) {
+      console.error("Failed to store config / exit config mode", e);
+      return;
+    }
+  };
 
   useEffect(() => {
-    register();
-    readConfig();
+    register()
+        // .then(() => readConfig());
   }, []);
 
   const [timeframe, setTimeframe] = useState<{ from: Date; to: Date }>({
@@ -123,7 +136,7 @@ const AppComponent = () => {
   const [authors, setAuthors] = useState<author[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<string>("");
 
-  const [ChartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [histogramChartData, setHistogramChartData] = useState([]);
 
   const loadData = async () => {
@@ -185,7 +198,10 @@ const AppComponent = () => {
 
   if (isConfiguring) {
     return (
-      <Configuration onDone={doneConfiguring} initialName={config?.name} />
+      <Configuration
+          onDone={doneConfiguring}
+          initialName={config?.name}
+      />
     );
   }
 
@@ -240,12 +256,13 @@ const AppComponent = () => {
       </section>
       <section id="graph" className="component" ref={setPlotEl}>
         {(
-          <HistogramPlot
-            data={histogramChartData}
-            timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
-            isResizing={isResizing}
-            width={containerWidth}
-            height={containerHeight}
+          <TimePlot
+              data={chartData}
+              timeframe={timeframe}
+              timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
+              isResizing={isResizing}
+              width={containerWidth}
+              height={containerHeight}
           />
         )}
       </section>

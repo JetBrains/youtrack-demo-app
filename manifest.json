@@ -19,7 +19,8 @@
       "indexPath": "plot/index.html",
       "extensionPoint": "DASHBOARD_WIDGET",
       "iconPath": "plot/widget-icon.svg",
-      "description": ""
+      "description": "",
+      "settingsSchemaPath": "plot/PlotConfiguration.json"
     }
   ]
 }

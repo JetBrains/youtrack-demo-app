@@ -1,0 +1,14 @@
+{
+  "title": "Contribution Plot Settings",
+  "type": "object",
+  "properties": {
+    "name": {
+      "title": "Your name",
+      "type": "string"
+    },
+    "query": {
+      "title": "The search query",
+      "type": "string"
+    }
+  }
+}

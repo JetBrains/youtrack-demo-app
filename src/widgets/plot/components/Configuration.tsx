@@ -13,17 +13,19 @@ const ConfigurationComponent: React.FunctionComponent<Props> = ({onDone, initial
     const [name, setName] = useState(initialName);
     const trimmedName = name.trim();
 
-    const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
-    }, []);
+    }
 
-    const onSubmit = useCallback((e?: React.SyntheticEvent) => {
+    const onSubmit = (e?: React.SyntheticEvent) => {
+        console.info("submitting start")
         e?.preventDefault();
+        console.info("submitting after prevent default")
         if (!trimmedName) {
             return;
         }
         onDone({name: trimmedName});
-    }, [onDone, trimmedName]);
+    }
 
     return (
       <form className="ring-form" onSubmit={onSubmit}>
@@ -32,7 +34,7 @@ const ConfigurationComponent: React.FunctionComponent<Props> = ({onDone, initial
         <Input label="Your name" value={name} onChange={onChange} autoFocus/>
 
         <ButtonSet className="config-buttons">
-          <Button primary type="submit" disabled={!trimmedName}>{'Save'}</Button>
+          <Button primary onClick={onSubmit} disabled={!trimmedName}>{'Save'}</Button>
           <Button onClick={() => onDone()}>{'Cancel'}</Button>
         </ButtonSet>
       </form>
