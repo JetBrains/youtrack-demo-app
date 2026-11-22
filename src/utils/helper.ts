@@ -2,7 +2,7 @@ import { InternMap, union, timeMonday, timeMondays, timeDays, timeDay } from "d3
 import type {ChartDataPoint} from "./types.d.ts";
 import {formatDuration} from "date-fns/formatDuration";
 import {contributionLabelScale} from "./colorScales.ts";
-import type {HostAPI} from "../../../../@types/globals";
+import type {HostAPI} from "../../@types/globals";
 
 // Resolves the YouTrack host, or null when running outside YouTrack (plain dev server)
 export const getHost = async (): Promise<HostAPI | null> => {

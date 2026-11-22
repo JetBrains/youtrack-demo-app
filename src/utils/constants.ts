@@ -1,5 +1,5 @@
 import { scaleDiverging, timeDay, timeFormat, timeMonday, timeMonth, timeYear } from "d3";
-import { TimeAggregationOption } from "./classes";
+import { TimeAggregationOption } from "./classes.ts";
 import { startOfQuarter } from "date-fns/fp";
 
 

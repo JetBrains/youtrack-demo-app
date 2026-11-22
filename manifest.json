@@ -14,13 +14,30 @@
   "youTrackApiAllowedEndpoints": [],
   "widgets": [
     {
-      "key": "chart",
-      "name": "My Chart",
-      "indexPath": "plot/index.html",
+      "key": "tile-plot",
+      "name": "Tile Plot of contributions",
+      "indexPath": "tile-plot/index.html",
       "extensionPoint": "DASHBOARD_WIDGET",
-      "iconPath": "plot/widget-icon.svg",
-      "description": "",
-      "settingsSchemaPath": "plot/PlotConfiguration.json"
+      "iconPath": "tile-plot/widget-icon.svg",
+      "description": "A GitHub-style chart that displays the intensity of contributions of different members over time.",
+      "settingsSchemaPath": "tile-plot/configuration-scheme.json"
+    },
+    {
+      "key": "histogram-plot",
+      "name": "Histogram Plot",
+      "indexPath": "histogram-plot/index.html",
+      "extensionPoint": "DASHBOARD_WIDGET",
+      "iconPath": "histogram-plot/widget-icon.svg",
+      "description": "A histogram plot that allows the user to show contribution frequencies.",
+      "settingsSchemaPath": "histogram-plot/configuration-scheme.json"
+    },
+    {
+      "key": "time-plot",
+      "name": "Contribution over time",
+      "indexPath": "time-plot/index.html",
+      "extensionPoint": "DASHBOARD_WIDGET",
+      "iconPath": "time-plot/widget-icon.svg",
+      "description": "A bar chart grouped by either days, months, etc. showing the contributed time to issues defined in a query."
     }
   ]
 }

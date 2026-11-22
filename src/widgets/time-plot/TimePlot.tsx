@@ -1,8 +1,8 @@
 // we only feed raw data into the component.
 import { useRef, useEffect, useMemo } from "react";
-import type { ChartDataPoint } from "../utils/types.d.ts";
+import type { ChartDataPoint } from "./types.d.ts";
 
-import { colorScaleContributionCategorical } from "../utils/colorScales.ts";
+import { colorScaleContributionCategorical } from "../../../utils/colorScales.ts";
 
 import { max, sort, union } from "d3-array";
 import { select } from "d3-selection";
@@ -10,9 +10,10 @@ import { scaleBand, scaleLinear } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
 import { timeDay, timeDays } from "d3-time";
 import "d3-transition";
-import { describeDataPoint } from "../utils/helper.ts";
-import { margins } from "../utils/constants.ts";
-import { TimeAggregationOption } from "../utils/classes.ts";
+
+import {describeDataPoint} from "../../utils/helper.ts";
+import {margins} from "../../utils/constants.ts";
+import {TimeAggregationOption} from "../../utils/classes.ts";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;

@@ -1,4 +1,4 @@
-import { HostAPI } from "../../../../@types/globals";
+import { HostAPI } from "../../@types/globals";
 import {AlertType} from "@jetbrains/ring-ui-built/components/alert/alert";
 import {mockData} from "./mockData.ts";
 import type {FetchedDataPoint} from "./types.d.ts";

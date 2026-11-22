@@ -1,7 +1,7 @@
 import type {CSSProperties} from 'react';
 import {formatDuration} from 'date-fns/formatDuration';
-import {contributionCategoryColour} from '../utils/colorScales.ts';
-import type {CategorySummary} from '../utils/processingData.ts';
+import {contributionCategoryColour} from '../../../utils/colorScales.ts';
+import type {CategorySummary} from '../../../utils/processingData.ts';
 
 type CategoryFilterTableProps = {
     summary: CategorySummary[];

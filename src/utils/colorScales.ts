@@ -1,5 +1,5 @@
 import { color, InternMap, scaleLinear, scaleThreshold, zip } from "d3";
-import { colorScaleContributionLinear, contributionLabels } from "./constants";
+import { colorScaleContributionLinear, contributionLabels } from "./constants.ts";
 
 export const intensityScale = scaleLinear().domain([0, 60]).range([0, 1]);
 

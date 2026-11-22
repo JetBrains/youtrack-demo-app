@@ -3,13 +3,13 @@ import React, { memo, useEffect, useState } from "react";
 
 import type { EmbeddableWidgetAPI, HostAPI } from "../../../@types/globals";
 import { Configuration } from "./components/Configuration.tsx";
-import type { WidgetConfiguration } from "./utils/types.d.ts";
+import type { WidgetConfiguration } from "../../utils/types.d.ts";
 import "@jetbrains/ring-ui-built/components/style.css";
 import "./app.css";
 import { sub } from "date-fns";
 
-import { extractAllPeople } from "./utils/dataService.ts";
-import { evaluateFromPOV, extractRelevantInfo } from "./utils/processingData.ts";
+import { extractAllPeople } from "../../utils/dataService.ts";
+import { evaluateFromPOV, extractRelevantInfo } from "../../utils/processingData.ts";
 import ButtonGroup from "@jetbrains/ring-ui-built/components/button-group/button-group";
 import Button from "@jetbrains/ring-ui-built/components/button/button";
 import type {
@@ -17,13 +17,13 @@ import type {
   ExtractedDataPoint,
   ChartDataPoint,
   FetchedDataPoint,
-} from "./utils/types.d.ts";
+} from "../../utils/types.d.ts";
 import ButtonToolbar from "@jetbrains/ring-ui-built/components/button-toolbar/button-toolbar";
 import TimePlot from "./components/TimePlot.tsx";
-import { useResizeObserver } from "./hooks/useResizeObserver.ts";
+import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
 import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-picker.js";
-import { mockData } from "./utils/mockData.ts";
-import { timeAggregationOptions } from "./utils/constants.ts";
+import { mockData } from "../../utils/mockData.ts";
+import { timeAggregationOptions } from "../../utils/constants.ts";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
