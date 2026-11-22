@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import "@jetbrains/ring-ui-built/components/style.css";
+import "../layout.css";
 import "./app.css";
 
 import type {EmbeddableWidgetAPI, HostAPI } from "../../../@types/globals";
@@ -21,7 +22,6 @@ import type {
 } from "./types.d.ts";
 
 import { mockData } from "../../utils/mockData.ts";
-import { timeAggregationOptions } from "../../utils/constants.ts";
 import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
 
 import TilePlot from "./TilePlot.tsx";
@@ -203,8 +203,13 @@ const AppComponent = () => {
               })}
             </ButtonGroup>
 
-            <Button onClick={() => loadData()}>Refresh Data</Button>
-
+            {isLocalhost &&
+                <Button
+                  onClick={() => loadData()}
+                >
+                  Refresh Data
+                </Button>
+            }
             <Button onClick={() => setIsConfiguring(!isConfiguring)}>
               Configure
             </Button>

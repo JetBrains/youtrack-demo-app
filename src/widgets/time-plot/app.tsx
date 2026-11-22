@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import "@jetbrains/ring-ui-built/components/style.css";
+import "../layout.css";
 import "./app.css";
 
 import type {EmbeddableWidgetAPI, HostAPI } from "../../../@types/globals";

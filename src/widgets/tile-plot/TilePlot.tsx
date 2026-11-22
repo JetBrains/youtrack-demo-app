@@ -2,21 +2,19 @@
 import { useRef, useEffect, useMemo } from "react";
 import type { ChartDataPoint } from "./types.d.ts";
 
-import { max, sort, union } from "d3-array";
+import { sort, union } from "d3-array";
 import { select } from "d3-selection";
-import { scaleBand, scaleLinear } from "d3-scale";
-import { axisLeft, axisBottom } from "d3-axis";
+import { scaleBand } from "d3-scale";
+import { axisLeft } from "d3-axis";
 import { timeDay, timeDays } from "d3-time";
 import "d3-transition";
 
 import {describeDataPoint} from "../../utils/helper.ts";
-import {margins} from "../../utils/constants.ts";
-import {TimeAggregationOption} from "../../utils/classes.ts";
 import {changeOpacity, colorScaleContributionCategorical, intensityScale} from "../../utils/colorScales.ts";
-import {timeMondays, timeFormat, timeMonday, timeSunday} from "d3";
+import {timeMondays, timeFormat, timeMonday} from "d3";
 
-const TRANSITION_MS = 500;
-const MIN_STEP_WIDTH = 30;
+const TRANSITION_MS = 500
+const margins = { left: 40, top: 0, bottom: 10, right: 10 }
 
 const WEEKDAYS = timeDays(timeMonday(new Date()), timeMonday.ceil(new Date())).map(
     d => timeFormat("%a")(d)
@@ -60,6 +58,10 @@ const TilePlot = ({
     const viewBoxWidth = width > 0 ? width : 0;
 
     // x: one band per aggregated day/week/... in the timeframe
+    const allDays: Date[] = useMemo(
+        () => timeDays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)),
+        [timeframe]
+    );
     const xBandValues: Date[] = useMemo(
         () => timeMondays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)),
         [timeframe.from, timeframe.to],
@@ -107,15 +109,15 @@ const TilePlot = ({
 
         const tickValues: Set<Date> = union(xBandValues)
 
-        svg
-            .select<SVGGElement>(".x.axis")
-            .transition()
-            .duration(duration)
-            .call(
-                axisBottom(xScale)
-                    .tickValues(tickValues)
-                    .tickFormat(timeFormat("cw %V"))
-            );
+        // svg
+        //     .select<SVGGElement>(".x.axis")
+        //     .transition()
+        //     .duration(duration)
+        //     .call(
+        //         axisBottom(xScale)
+        //             .tickValues(tickValues)
+        //             .tickFormat(timeFormat("cw %V"))
+        //     );
 
         pinnedAxes
             .select<SVGGElement>(".y.axis")
@@ -132,10 +134,22 @@ const TilePlot = ({
                 (enter) => {
                     const rects = enter.append("rect");
                     rects.append("title");
+
+                    rects
+                        .attr("fill", (d: ChartDataPoint) => colorScaleContributionCategorical(d.contribution))
+                        .attr("opacity", 0)
+                        .transition()
+                        .duration(duration)
+                        .attr("opacity", (d: ChartDataPoint) => intensityScale(d.totalMinutes));
+
                     return rects;
                 },
                 (update) => {
                     return update
+                        .transition()
+                        .duration(duration)
+                        .attr("opacity", (d: ChartDataPoint) => intensityScale(d.totalMinutes))
+                        .attr("fill", (d: ChartDataPoint) => colorScaleContributionCategorical(d.contribution))
                 },
                 (exit) => exit.remove(),
             )
@@ -148,9 +162,6 @@ const TilePlot = ({
             .attr("y", (d: ChartDataPoint) => yScale(timeFormat("%a")(d.date)) ?? - yScale.bandwidth())
             .attr("ry", 0.2 * yScale.bandwidth())
             .attr("height", yScale.bandwidth())
-            .transition()
-            .duration(duration)
-            .attr("fill", (d: ChartDataPoint) => changeOpacity(colorScaleContributionCategorical(d.contribution), intensityScale(d.minutes)))
             .call((rects) =>
                 rects
                     .select("title")
