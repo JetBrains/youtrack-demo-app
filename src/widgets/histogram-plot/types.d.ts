@@ -4,12 +4,8 @@ export type WidgetConfiguration = {
 }
 
 export type ChartDataPoint = {
-    date: Date,
-    minutes: number,
-    avgMinutes: number,
-    totalMinutes: number,
-    contribution: number,
-    contributionCategory: string
+    bracket: string;
+    count: number
 }
 
 export type ChartConfig = {

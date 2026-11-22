@@ -26,6 +26,8 @@ import { timeAggregationOptions } from "../../utils/constants.ts";
 import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
 
 import HistogramPlot from "./HistogramPlot.tsx";
+import {bin, flatRollup, map} from "d3";
+import {max, range, rollup, sum} from "d3-array";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -170,12 +172,41 @@ const AppComponent = () => {
 
     const groupingFunction = timeAggregationOptions.get(selectedTimeAggregationKey)!.dateAggregationFunction;
 
-    const povData = evaluateFromPOV(
-        selectedPerson,
+    const minutesPerTimeframe = rollup(
         extractedDataPoints,
-        groupingFunction
-    );
-    setChartData([...povData]);
+        D => sum(D.map(d => d.minutes)),
+        d => groupingFunction(d.date)
+    )
+    const BIN_MINUTES = 5
+    const minutesPerPersonAndTimeframe = rollup(
+        extractedDataPoints,
+        D => sum(D.map(d => d.minutes)),
+        d => d.authorId,
+        d => groupingFunction(d.date)
+    )
+
+    const maxY = max(minutesPerTimeframe, d => d[1])
+    const upperBound = Math.ceil((maxY + 1) / BIN_MINUTES) * BIN_MINUTES;
+    const binner = bin()
+        .value(d => d)
+        .domain([0, maxY])
+        .thresholds(range(0, upperBound, BIN_MINUTES));
+
+    const countByPersonAndBin = flatRollup(
+        extractedDataPoints,
+        D => sum(D.map(d => d.minutes)),
+        d => d.authorId,
+        d => groupingFunction(d.date)
+    )
+
+    const countMapByPersonAndBin = rollup(
+        countByPersonAndBin,
+        D => D.length,
+        d => d[0],
+        d => Math.floor(d[2] / BIN_MINUTES) * BIN_MINUTES
+    )
+
+    setChartData([...countMapByPersonAndBin]);
   }, [extractedDataPoints, selectedPerson, selectedTimeAggregationKey]);
 
   if (isConfiguring) {
