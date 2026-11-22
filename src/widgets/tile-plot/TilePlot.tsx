@@ -13,24 +13,49 @@ import {describeDataPoint} from "../../utils/helper.ts";
 import {margins} from "../../utils/constants.ts";
 import {TimeAggregationOption} from "../../utils/classes.ts";
 import {colorScaleContributionCategorical} from "../../utils/colorScales.ts";
+import {timeMondays, timeFormat} from "d3";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;
+
+// 0 = Monday ... 6 = Sunday
+const WEEKDAY_INDICES = [0, 1, 2, 3, 4, 5, 6];
+
+// YouTrack's user locale if available (not on localhost), otherwise the browser's language
+const getLocale = (): string => {
+    const candidates = [
+        typeof YTApp !== "undefined" ? YTApp.locale : undefined,
+        navigator.language,
+    ];
+    return candidates.find((l) => {
+        if (!l) return false;
+        try {
+            return Intl.DateTimeFormat.supportedLocalesOf(l.replace("_", "-")).length > 0;
+        } catch {
+            return false;
+        }
+    })?.replace("_", "-") ?? "en";
+};
+
+// localized short weekday names, Monday first
+const getWeekdayLabels = (locale: string): string[] => {
+    const formatter = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" });
+    // 2024-01-01 was a Monday
+    return WEEKDAY_INDICES.map((i) => formatter.format(new Date(Date.UTC(2024, 0, 1 + i))));
+};
 
 const TilePlot = ({
                       data,
                       timeframe,
                       width,
                       height,
-                      isResizing,
-                      timeAggregation
+                      isResizing
                   }: {
     data: ChartDataPoint[];
     timeframe: { from: Date, to: Date };
     width: number;
     height: number;
     isResizing: boolean;
-    timeAggregation: TimeAggregationOption
 }) => {
     const pinnedRef = useRef<SVGSVGElement>(null);
     const chartRef = useRef<SVGSVGElement>(null);
@@ -42,11 +67,8 @@ const TilePlot = ({
 
     // x: one band per aggregated day/week/... in the timeframe
     const xBandValues: Date[] = useMemo(
-        () =>
-            timeDays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)).map(
-                timeAggregation.dateAggregationFunction,
-            ),
-        [timeframe.from, timeframe.to, timeAggregation],
+        () => timeMondays(timeDay.floor(timeframe.from), timeDay.ceil(timeframe.to)),
+        [timeframe.from, timeframe.to],
     );
 
     // the scrolling area is everything right of the pinned y-axis; it must be wider than
@@ -76,23 +98,19 @@ const TilePlot = ({
 
         const duration = dataChanged ? TRANSITION_MS : 0;
 
-
-        const {
-            dateAggregationFunction,
-            tickValueFormattingFunction
-        } = timeAggregation
+        // y: one band per weekday, Monday (0) at the top to Sunday (6) at the bottom
+        const yScale = scaleBand<number>()
+            .domain(WEEKDAY_INDICES)
+            .range([0, canvasHeight])
+            .padding(0.2);
+        const weekdayLabels = getWeekdayLabels(getLocale());
 
         const xScale = scaleBand<Date>()
             .domain(xBandValues)
             .range([0, contentWidth])
             .padding(0.2);
 
-        const yScale = scaleLinear()
-            .domain([0, max(data, (d) => d.totalMinutes) as number])
-            .range([canvasHeight, 0])
-            .nice();
-
-        const tickValues: Set<Date> = union(xBandValues.map(dateAggregationFunction))
+        const tickValues: Set<Date> = union(xBandValues)
 
         svg
             .select<SVGGElement>(".x.axis")
@@ -101,14 +119,14 @@ const TilePlot = ({
             .call(
                 axisBottom(xScale)
                     .tickValues(tickValues)
-                    .tickFormat(tickValueFormattingFunction)
+                    .tickFormat(timeFormat("cw %V"))
             );
 
         pinnedAxes
             .select<SVGGElement>(".y.axis")
             .transition()
             .duration(duration)
-            .call(axisLeft(yScale));
+            .call(axisLeft(yScale).tickFormat((d) => weekdayLabels[d]));
 
         const canvas = svg.select(".canvas");
         // bars, keyed by day so changed data updates in place instead of appending duplicates
@@ -187,7 +205,7 @@ const TilePlot = ({
                     .select("title")
                     .text((d) => describeDataPoint(d)),
             );
-    }, [data, viewBoxWidth, viewBoxHeight, xBandValues, contentWidth, timeAggregation]);
+    }, [data, viewBoxWidth, viewBoxHeight, xBandValues, contentWidth]);
 
 
     // hovering the chart + mouse wheel scrolls it horizontally, handled via d3's event binding
