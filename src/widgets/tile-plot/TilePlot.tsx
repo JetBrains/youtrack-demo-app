@@ -65,10 +65,19 @@ const TilePlot = ({
         [timeframe.from, timeframe.to],
     );
 
+    const canvasWidth = viewBoxWidth - margins.left - margins.right;
+    const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
+
+    // y: one band per weekday, Monday (0) at the top to Sunday (6) at the bottom
+    const yScale = scaleBand<number>()
+        .domain(WEEKDAYS, d => timeFormat("%a")(d))
+        .range([0, canvasHeight])
+        .padding(0.2);
+
     // the scrolling area is everything right of the pinned y-axis; it must be wider than
     // the visible area, otherwise .scroll-area has nothing to scroll
     const visibleCanvasWidth = viewBoxWidth - margins.left - margins.right;
-    const contentWidth = Math.max(visibleCanvasWidth, union(xBandValues).size * MIN_STEP_WIDTH);
+    const contentWidth = Math.max(visibleCanvasWidth, union(xBandValues).size * yScale.step());
 
     useEffect(() => {
         if (!chartRef.current || !pinnedRef.current) {
@@ -78,8 +87,6 @@ const TilePlot = ({
         const svg = select(chartRef.current);
         const pinnedAxes = select(pinnedRef.current);
 
-        const canvasWidth = viewBoxWidth - margins.left - margins.right;
-        const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
         // not measured yet (or nothing to show): wait for the next width/height/data change
         if (canvasWidth <= 0 || canvasHeight <= 0 || data.length === 0) {
             return;
@@ -92,11 +99,6 @@ const TilePlot = ({
 
         const duration = dataChanged ? TRANSITION_MS : 0;
 
-        // y: one band per weekday, Monday (0) at the top to Sunday (6) at the bottom
-        const yScale = scaleBand<number>()
-            .domain(WEEKDAYS, d => timeFormat("%a")(d))
-            .range([0, canvasHeight])
-            .padding(0.2);
 
         const xScale = scaleBand<Date>()
             .domain(xBandValues)
@@ -195,7 +197,6 @@ const TilePlot = ({
         };
     }, []);
 
-    const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
     return (
         <div className={`scrollable-canvas ${isResizing ? "resizing" : ""}`}>
             <svg
