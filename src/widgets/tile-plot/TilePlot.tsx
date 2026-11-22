@@ -77,7 +77,7 @@ const TilePlot = ({
     // the scrolling area is everything right of the pinned y-axis; it must be wider than
     // the visible area, otherwise .scroll-area has nothing to scroll
     const visibleCanvasWidth = viewBoxWidth - margins.left - margins.right;
-    const contentWidth = Math.max(visibleCanvasWidth, union(xBandValues).size * yScale.step());
+    const contentWidth = union(xBandValues).size * yScale.step();
 
     useEffect(() => {
         if (!chartRef.current || !pinnedRef.current) {
