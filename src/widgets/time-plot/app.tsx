@@ -17,7 +17,7 @@ import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-pic
 
 import type {author, ExtractedDataPoint, FetchedDataPoint} from "../../utils/types";
 import type {
-  ChartDataPoint,
+  ChartDataPoint, WidgetConfiguration,
 } from "./types.d.ts";
 
 import { mockData } from "../../utils/mockData.ts";
@@ -247,7 +247,7 @@ const AppComponent = () => {
                   isResizing={isResizing}
                   width={containerWidth}
                   height={containerHeight}
-                  timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
+                  timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)!}
               />
           )}
         </section>

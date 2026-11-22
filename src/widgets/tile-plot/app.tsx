@@ -17,7 +17,7 @@ import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-pic
 
 import type {author, ExtractedDataPoint, FetchedDataPoint} from "../../utils/types";
 import type {
-  ChartDataPoint,
+  ChartDataPoint, WidgetConfiguration,
 } from "./types.d.ts";
 
 import { mockData } from "../../utils/mockData.ts";
@@ -230,7 +230,6 @@ const AppComponent = () => {
                   timeframe={timeframe}
                   width={containerWidth}
                   height={containerHeight}
-                  config={config}
                   isResizing={isResizing}
               />
               // <DummyComponent data={chartData} config={config} width={containerWidth} height={containerHeight} />

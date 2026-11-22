@@ -69,8 +69,8 @@ const TilePlot = ({
     const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
 
     // y: one band per weekday, Monday (0) at the top to Sunday (6) at the bottom
-    const yScale = scaleBand<number>()
-        .domain(WEEKDAYS, d => timeFormat("%a")(d))
+    const yScale = scaleBand<string>()
+        .domain(WEEKDAYS)
         .range([0, canvasHeight])
         .padding(0.2);
 
@@ -139,18 +139,18 @@ const TilePlot = ({
                 },
                 (exit) => exit.remove(),
             )
-            .attr("data-value", (d) => d.contribution)
-            .attr("data-date", (d) => d.date)
+            .attr("data-value", (d: ChartDataPoint) => d.contribution)
+            .attr("data-date", (d: ChartDataPoint) => d.date.toLocaleDateString())
             .attr("class", "own-contribution")
-            .attr("x", (d) => xScale(timeMonday(d.date)) ?? - xScale.bandwidth())
+            .attr("x", (d: ChartDataPoint) => xScale(timeMonday(d.date)) ?? - xScale.bandwidth())
             .attr("width", xScale.bandwidth())
             .attr("rx", 0.2 * xScale.bandwidth())
-            .attr("y", (d) => yScale(timeFormat("%a")(d.date)))
+            .attr("y", (d: ChartDataPoint) => yScale(timeFormat("%a")(d.date)) ?? - yScale.bandwidth())
             .attr("ry", 0.2 * yScale.bandwidth())
             .attr("height", yScale.bandwidth())
             .transition()
             .duration(duration)
-            .attr("fill", (d) => changeOpacity(colorScaleContributionCategorical(d.contribution), intensityScale(d.minutes)))
+            .attr("fill", (d: ChartDataPoint) => changeOpacity(colorScaleContributionCategorical(d.contribution), intensityScale(d.minutes)))
             .call((rects) =>
                 rects
                     .select("title")
