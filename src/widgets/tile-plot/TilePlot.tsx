@@ -12,14 +12,15 @@ import "d3-transition";
 import {describeDataPoint} from "../../utils/helper.ts";
 import {margins} from "../../utils/constants.ts";
 import {TimeAggregationOption} from "../../utils/classes.ts";
-import {colorScaleContributionCategorical} from "../../utils/colorScales.ts";
-import {timeMondays, timeFormat} from "d3";
+import {changeOpacity, colorScaleContributionCategorical, intensityScale} from "../../utils/colorScales.ts";
+import {timeMondays, timeFormat, timeMonday, timeSunday} from "d3";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;
 
-// 0 = Monday ... 6 = Sunday
-const WEEKDAY_INDICES = [0, 1, 2, 3, 4, 5, 6];
+const WEEKDAYS = timeDays(timeMonday(new Date()), timeMonday.ceil(new Date())).map(
+    d => timeFormat("%a")(d)
+);
 
 // YouTrack's user locale if available (not on localhost), otherwise the browser's language
 const getLocale = (): string => {
@@ -35,13 +36,6 @@ const getLocale = (): string => {
             return false;
         }
     })?.replace("_", "-") ?? "en";
-};
-
-// localized short weekday names, Monday first
-const getWeekdayLabels = (locale: string): string[] => {
-    const formatter = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" });
-    // 2024-01-01 was a Monday
-    return WEEKDAY_INDICES.map((i) => formatter.format(new Date(Date.UTC(2024, 0, 1 + i))));
 };
 
 const TilePlot = ({
@@ -100,10 +94,9 @@ const TilePlot = ({
 
         // y: one band per weekday, Monday (0) at the top to Sunday (6) at the bottom
         const yScale = scaleBand<number>()
-            .domain(WEEKDAY_INDICES)
+            .domain(WEEKDAYS, d => timeFormat("%a")(d))
             .range([0, canvasHeight])
             .padding(0.2);
-        const weekdayLabels = getWeekdayLabels(getLocale());
 
         const xScale = scaleBand<Date>()
             .domain(xBandValues)
@@ -126,80 +119,36 @@ const TilePlot = ({
             .select<SVGGElement>(".y.axis")
             .transition()
             .duration(duration)
-            .call(axisLeft(yScale).tickFormat((d) => weekdayLabels[d]));
+            .call(axisLeft(yScale));
 
         const canvas = svg.select(".canvas");
-        // bars, keyed by day so changed data updates in place instead of appending duplicates
-        canvas
-            .selectAll<SVGRectElement, ChartDataPoint>("rect.total-minutes")
-            .data(sort(data, d => d.date), (d) => d.date.getTime())
-            .join(
-                (enter) => {
-                    const rects = enter
-                        .append("rect")
-                        .attr("y", canvasHeight)
-                        .attr("height", 0)
-                        .attr("opacity", () => 0.2);
-
-                    rects
-                        .transition()
-                        .duration(duration)
-                        .delay((_, i) => i * 10)
-                        .attr("y", (d) => yScale(d.totalMinutes))
-                        .attr("height", (d) => canvasHeight - yScale(d.totalMinutes));
-
-                    rects.append("title");
-                    return rects;
-                },
-                (update) => update
-                    .transition()
-                    .duration(duration)
-                    .attr("y", (d) => yScale(d.totalMinutes))
-                    .attr("height", (d) => canvasHeight - yScale(d.totalMinutes)),
-
-                (exit) => exit.remove(),
-            )
-            .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
-            .attr("width", xScale.bandwidth())
-            .attr("data-value", (d) => d.totalMinutes)
-            .attr("class", "total-minutes");
 
         canvas
             .selectAll<SVGRectElement, ChartDataPoint>("rect.own-contribution")
             .data(sort(data, d => d.date), d => d.date.getTime())
             .join(
                 (enter) => {
-                    const rects = enter
-                        .append("rect")
-                        .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
-                        .attr("y", canvasHeight)
-                        .attr("height", 0);
-
-                    rects
-                        .transition()
-                        .duration(duration)
-                        .attr("y", (d) => yScale(d.minutes))
-                        .attr("height", (d) => canvasHeight - yScale(d.minutes));
+                    const rects = enter.append("rect");
                     rects.append("title");
                     return rects;
                 },
                 (update) => {
                     return update
-                        .attr("y", canvasHeight)
-                        .attr("height", 0)
-                        .transition()
-                        .duration(duration)
-                        .delay((_, i) => 100 + i * 10)
-                        .attr("fill", (d) => colorScaleContributionCategorical(d.contribution))
-                        .attr("y", (d) => yScale(d.minutes))
-                        .attr("height", (d) => canvasHeight - yScale(d.minutes));
                 },
                 (exit) => exit.remove(),
             )
             .attr("data-value", (d) => d.contribution)
+            .attr("data-date", (d) => d.date)
             .attr("class", "own-contribution")
-            .attr("x", (d) => xScale(d.date) ?? - xScale.bandwidth())
+            .attr("x", (d) => xScale(timeMonday(d.date)) ?? - xScale.bandwidth())
             .attr("width", xScale.bandwidth())
+            .attr("rx", 0.2 * xScale.bandwidth())
+            .attr("y", (d) => yScale(timeFormat("%a")(d.date)))
+            .attr("ry", 0.2 * yScale.bandwidth())
+            .attr("height", yScale.bandwidth())
+            .transition()
+            .duration(duration)
+            .attr("fill", (d) => changeOpacity(colorScaleContributionCategorical(d.contribution), intensityScale(d.minutes)))
             .call((rects) =>
                 rects
                     .select("title")

@@ -26,6 +26,7 @@ import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
 
 import TilePlot from "./TilePlot.tsx";
 import DummyComponent from "../../components/DummyComponent.tsx";
+import {timeDay} from "d3";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -168,12 +169,10 @@ const AppComponent = () => {
       return;
     }
 
-    const groupingFunction = timeAggregationOptions.get(selectedTimeAggregationKey)!.dateAggregationFunction;
-
     const povData = evaluateFromPOV(
         selectedPerson,
         extractedDataPoints,
-        groupingFunction
+        timeDay
     );
     setChartData([...povData]);
   }, [extractedDataPoints, selectedPerson, selectedTimeAggregationKey]);
@@ -186,7 +185,6 @@ const AppComponent = () => {
         />
     );
   }
-
   return (
       <>
         <section id="header" className="component">
@@ -205,22 +203,7 @@ const AppComponent = () => {
               })}
             </ButtonGroup>
 
-            {/*<Button onClick={() => loadData()}>Refresh Data</Button>*/}
-
-            <ButtonGroup>
-              {Array.from(timeAggregationOptions.keys()).map((key) => {
-                return (
-                    <Button
-                        key={key}
-                        value={key}
-                        onClick={() => setSelectedTimeAggregationKey(key)}
-                        active={key === selectedTimeAggregationKey}
-                    >
-                      {key}
-                    </Button>
-                )
-              })}
-            </ButtonGroup>
+            <Button onClick={() => loadData()}>Refresh Data</Button>
 
             <Button onClick={() => setIsConfiguring(!isConfiguring)}>
               Configure
@@ -249,7 +232,6 @@ const AppComponent = () => {
                   height={containerHeight}
                   config={config}
                   isResizing={isResizing}
-                  timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
               />
               // <DummyComponent data={chartData} config={config} width={containerWidth} height={containerHeight} />
           )}
