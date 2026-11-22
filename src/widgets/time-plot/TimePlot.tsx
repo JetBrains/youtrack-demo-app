@@ -2,8 +2,6 @@
 import { useRef, useEffect, useMemo } from "react";
 import type { ChartDataPoint } from "./types.d.ts";
 
-import { colorScaleContributionCategorical } from "../../../utils/colorScales.ts";
-
 import { max, sort, union } from "d3-array";
 import { select } from "d3-selection";
 import { scaleBand, scaleLinear } from "d3-scale";
@@ -14,6 +12,7 @@ import "d3-transition";
 import {describeDataPoint} from "../../utils/helper.ts";
 import {margins} from "../../utils/constants.ts";
 import {TimeAggregationOption} from "../../utils/classes.ts";
+import {colorScaleContributionCategorical} from "../../utils/colorScales.ts";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;

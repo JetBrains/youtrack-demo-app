@@ -1,9 +1,8 @@
 import Text from "@jetbrains/ring-ui-built/components/text/text.js"
 import { rollup, sum } from "d3"
 import { differenceInDays } from "date-fns/fp"
-import { compareContributionToRest, formatMinutesAsHoursAndMinutes } from "../../../utils/helper";
-
-import type {ChartDataPoint} from "../../../utils/types";
+import { compareContributionToRest, formatMinutesAsHoursAndMinutes } from "../../utils/helper.ts";
+import type { ChartDataPoint } from "../../utils/types";
 
 const TimePlotSummary = ( { timeframe, data, contributingPeopleCount }: {
     timeframe: { from: Date, to: Date },

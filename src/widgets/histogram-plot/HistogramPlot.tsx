@@ -1,8 +1,6 @@
 // we only feed raw data into the component.
 import { useRef, useEffect, useMemo } from "react";
-import { ChartDataPoint } from "../../../utils/types";
-
-
+import type { ChartDataPoint } from "./types.d.ts";
 
 import { max, range } from "d3-array";
 import { select } from "d3-selection";
@@ -11,8 +9,8 @@ import { axisLeft, axisBottom } from "d3-axis";
 
 import "d3-transition";
 
-import { margins } from "../../../utils/constants.ts";
-import { TimeAggregationOption } from "../../../utils/classes.ts";
+import { margins } from "../../utils/constants.ts";
+import { TimeAggregationOption } from "../../utils/classes.ts";
 
 
 const TRANSITION_MS = 500;

@@ -3,7 +3,7 @@ import React, { memo, useState } from 'react';
 import Input from '@jetbrains/ring-ui-built/components/input/input';
 import Button from '@jetbrains/ring-ui-built/components/button/button';
 import ButtonSet from '@jetbrains/ring-ui-built/components/button-set/button-set';
-import type {WidgetConfiguration} from '../../../utils/types.d.ts';
+import {WidgetConfiguration} from "../../widgets/tile-plot/types";
 
 interface Props {
     onDone: (config?: WidgetConfiguration) => void;

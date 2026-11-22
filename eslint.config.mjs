@@ -70,7 +70,7 @@ export default tseslint.config(
         }
     },
     {
-        files: ['src/widgets/plot/utils/mockData.ts'],
+        files: ['src/widgets/dev/utils/mockData.ts'],
         rules: { 'no-magic-numbers': 'off' },
     },
 );

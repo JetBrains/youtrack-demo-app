@@ -1,15 +1,14 @@
 /* eslint-disable no-console */
 import React, { memo, useEffect, useState } from "react";
 
-import type { EmbeddableWidgetAPI, HostAPI } from "../../../@types/globals";
+import type { EmbeddableWidgetAPI, HostAPI } from "../../@types/globals";
 import { Configuration } from "./components/Configuration.tsx";
-import type { WidgetConfiguration } from "../../utils/types.d.ts";
 import "@jetbrains/ring-ui-built/components/style.css";
 import "./app.css";
 import { sub } from "date-fns";
 
-import { extractAllPeople } from "../../utils/dataService.ts";
-import { evaluateFromPOV, extractRelevantInfo } from "../../utils/processingData.ts";
+import { extractAllPeople } from "../utils/dataService.ts";
+import { evaluateFromPOV, extractRelevantInfo } from "../utils/processingData.ts";
 import ButtonGroup from "@jetbrains/ring-ui-built/components/button-group/button-group";
 import Button from "@jetbrains/ring-ui-built/components/button/button";
 import type {
@@ -17,13 +16,13 @@ import type {
   ExtractedDataPoint,
   ChartDataPoint,
   FetchedDataPoint,
-} from "../../utils/types.d.ts";
+} from "../utils/types.d.ts";
 import ButtonToolbar from "@jetbrains/ring-ui-built/components/button-toolbar/button-toolbar";
-import TimePlot from "./components/TimePlot.tsx";
-import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
+import DummyComponent from "../components/DummyComponent.tsx";
+import { useResizeObserver } from "../hooks/useResizeObserver.ts";
 import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-picker.js";
-import { mockData } from "../../utils/mockData.ts";
-import { timeAggregationOptions } from "../../utils/constants.ts";
+import { mockData } from "../utils/mockData.ts";
+import { timeAggregationOptions } from "../utils/constants.ts";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -240,11 +239,9 @@ const AppComponent = () => {
       </section>
       <section id="graph" className="component" ref={(el: HTMLElement | null) => setPlotEl(el as HTMLDivElement | null)}>
         {(
-          <TimePlot
+          <DummyComponent
             data={chartData}
-            timeframe={timeframe}
-            timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)!}
-            isResizing={isResizing}
+            config={config}
             width={containerWidth}
             height={containerHeight}
           />
@@ -254,4 +251,4 @@ const AppComponent = () => {
   );
 };
 
-export const App = memo(AppComponent);
+export const Templateapp = memo(AppComponent);

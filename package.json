@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:widget": "vite serve './src/widgets/plot'",
+    "dev:widget": "vite serve 'src/dev'",
     "build": "tsc -p tsconfig.app.json && vite build && youtrack-app validate dist",
     "build:nolint": "vite build && youtrack-app validate dist",
     "lint": "eslint . --ext cjs,js,ts,tsx --report-unused-disable-directives --max-warnings 0",

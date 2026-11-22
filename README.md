@@ -1,8 +1,8 @@
-# YouTrack Demo App
+# YouTrack Demo Templateapp
 
 ![Team](https://jb.gg/badges/team-plastic.svg)
 
-Once installed into [JetBrains YouTrack](https://www.jetbrains.com/youtrack/), this App utilizes available extension points for demo reasons.
+Once installed into [JetBrains YouTrack](https://www.jetbrains.com/youtrack/), this Templateapp utilizes available extension points for demo reasons.
 
 ### Installation 
 
@@ -14,7 +14,7 @@ Once installed into [JetBrains YouTrack](https://www.jetbrains.com/youtrack/), t
 4. Go to `%YOUTRACK_URL%/admin/apps` (you need admin permissions to do so)
 5. Import app from ZIP archive
 6. Attach app to desired projects on `%YOUTRACK_URL%/admin/editProject/%PROJECT_ID%?tab=apps` page
-7. Open an issue in desired project and check App widgets appear
+7. Open an issue in desired project and check Templateapp widgets appear
 
 #### CLI way (useful for developing)
 

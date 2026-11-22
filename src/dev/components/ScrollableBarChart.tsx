@@ -2,7 +2,7 @@
 // Total hours per day. Bars keep a fixed width, so a long range scrolls horizontally
 // while the y-axis stays pinned in its own svg.
 import { useRef, useEffect } from "react";
-import type { ChartDataPoint } from "../../../utils/types.d.ts";
+import type { ChartDataPoint } from "../../utils/types.d.ts";
 
 import { max } from "d3-array";
 import { select } from "d3-selection";
@@ -10,7 +10,7 @@ import { scaleBand, scaleLinear, scaleThreshold } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
 import { timeMonday } from "d3-time";
 import "d3-transition";
-import { BAR_STEP, margins } from "../../../utils/constants.ts";
+import { BAR_STEP, margins } from "../../utils/constants.ts";
 
 const TRANSITION_MS = 500;
 

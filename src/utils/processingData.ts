@@ -5,7 +5,6 @@ import {compareContributionToRest} from "./helper.ts";
 import {contributionLabelScale} from "./colorScales.ts";
 import {contributionLabels} from "./constants.ts";
 
-
 export const extractRelevantInfo = (fetchedData: FetchedDataPoint[]): ExtractedDataPoint[] => fetchedData.map(d => {
     const date = timeDay.floor(new Date(d.date));
     return {

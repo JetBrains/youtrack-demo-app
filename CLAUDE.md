@@ -10,13 +10,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture Overview
 
 ### Project Structure
-This is a **YouTrack App** — a widget framework that extends JetBrains YouTrack. Each widget is an independent React component that runs in an iframe within YouTrack's UI.
+This is a **YouTrack Templateapp** — a widget framework that extends JetBrains YouTrack. Each widget is an independent React component that runs in an iframe within YouTrack's UI.
 
 ```
 src/
 ├── widgets/
 │   └── plot/          # Primary widget: Contributions over Time (worklog visualization)
-│       ├── app.tsx         # Main React component
+│       ├── templateapp.tsx         # Main React component
 │       ├── Plot.tsx    # D3 visualization of worklogs as a Git-style heatmap
 │       ├── RadialChart.tsx # WIP radial chart visualization (mostly commented out)
 │       ├── types.d.ts        # TypeScript types for YouTrack data
@@ -32,7 +32,7 @@ src/
 Each widget follows this pattern:
 1. **index.html** — Minimal HTML shell that loads the React entry point
 2. **index.tsx** — Mounts React app and calls `YTApp.register()` to connect to YouTrack's Host API
-3. **app.tsx** — Wraps the core component (Plot, RadialChart, etc.) and manages YouTrack integration
+3. **templateapp.tsx** — Wraps the core component (Plot, RadialChart, etc.) and manages YouTrack integration
 4. **Component file** (e.g., Plot.tsx) — Contains the actual visualization logic
 
 ### Key Architectural Patterns

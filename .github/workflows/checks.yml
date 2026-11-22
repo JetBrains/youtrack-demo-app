@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Check App
+    - name: Check Templateapp
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'

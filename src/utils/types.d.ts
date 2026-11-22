@@ -18,3 +18,12 @@ export type ExtractedDataPoint = {
     authorId: string;
     date: Date;
 }
+
+export type ChartDataPoint = {
+    date: Date,
+    minutes: number,
+    avgMinutes: number,
+    totalMinutes: number,
+    contribution: number,
+    contributionCategory: string
+}
