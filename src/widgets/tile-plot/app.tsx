@@ -25,6 +25,7 @@ import { timeAggregationOptions } from "../../utils/constants.ts";
 import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
 
 import TilePlot from "./TilePlot.tsx";
+import DummyComponent from "../../components/DummyComponent.tsx";
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -243,10 +244,14 @@ const AppComponent = () => {
           {(
               <TilePlot
                   data={chartData}
-                  config={config}
+                  timeframe={timeframe}
                   width={containerWidth}
                   height={containerHeight}
+                  config={config}
+                  isResizing={isResizing}
+                  timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)}
               />
+              // <DummyComponent data={chartData} config={config} width={containerWidth} height={containerHeight} />
           )}
         </section>
       </>
