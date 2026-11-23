@@ -3,6 +3,7 @@ import { InternMap } from "d3";
 export type WidgetConfiguration = {
     title: string;
     query: string;
+    binSize: number;
 }
 
 export type ChartData = InternMap<string, InternMap<number, number>>

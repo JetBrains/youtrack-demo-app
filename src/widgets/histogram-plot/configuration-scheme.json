@@ -9,6 +9,10 @@
     "query": {
       "title": "Enter a search query",
       "type": "string"
+    },
+    "binSize": {
+      "title": "Value for the width in minutes",
+      "type": "number"
     }
   }
 }
