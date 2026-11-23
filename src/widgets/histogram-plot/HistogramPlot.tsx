@@ -1,6 +1,6 @@
 // we only feed raw data into the component.
 import { useRef, useEffect, useMemo } from "react";
-import type { ChartConfig, ChartDataPoint } from "./types.d.ts";
+import type { ChartConfig, ChartData, ChartDataPoint } from "./types.d.ts";
 
 import { max, range } from "d3-array";
 import { select } from "d3-selection";
@@ -29,28 +29,15 @@ const HistogramPlot = ({
   const viewBoxHeight = height > 0 ? height : 0;
   const viewBoxWidth = width > 0 ? width : 0;
   const maxCounts = useMemo(
-    () => max(data.values(), inner => max(inner.values())) ?? 0,
+    () => max(data.values()) ?? 0,
     [data]
   );
   const maxMinutes = useMemo(
-    () => max(data.values(), inner => max(inner.keys())) ?? 0,
+    () => max(data.keys()) ?? 0,
     [data]
   );
-  // one band per bin, identified by its start in minutes: 0, BIN_SIZE_MINUTES, ... maxMinutes - BIN_SIZE_MINUTES
 
   const bands = useMemo(() => range(0, maxMinutes, binWidthMinutes), [maxMinutes]);
-  // number of data points falling into each band (a value equal to maxMinutes lands in the last band)
-  const bins = useMemo(() => {
-    const counts = bands.map((start) => ({ start, count: 0 }));
-    for (const d of data) {
-      if (!Number.isFinite(d.minutes)) {
-        continue;
-      }
-      const index = Math.max(0, Math.min(Math.floor(d.minutes / BIN_SIZE_MINUTES), bands.length - 1));
-      counts[index].count += 1;
-    }
-    return counts;
-  }, [data, bands]);
 
   // the scrolling area is everything right of the pinned y-axis; it must be wider than
   // the visible area, otherwise .scroll-area has nothing to scroll
@@ -102,16 +89,6 @@ const HistogramPlot = ({
       .call(axisLeft(yScale));
 
     const canvas = svg.select(".canvas");
-    const groupsPerAuthor = canvas.selectAll("g")
-      .data(data)
-      .enter()
-      .append("g")
-      .attr("class", "author")
-      .attr("data-author", d => d[0])
-      .attr("stroke", (_, i) => ["red", "blue", "green"][i])
-      .attr("stroke-width", 1)
-      .attr("fill", (_, i) => ["red", "blue", "green"][i])
-      .attr("fill-opacity", 0.33);
     
     // each inner map entry is [minutes, count]: the key picks the band (x), the value the y position.
     // the area is vertical: x follows the band centre, y0 is the baseline, y1 the count.
@@ -120,19 +97,12 @@ const HistogramPlot = ({
       .y0(yScale(0))
       .y1(([, count]) => yScale(count))
       .curve(curveMonotoneY);
-
-    groupsPerAuthor
-      .selectAll<SVGPathElement, [number, number][]>("path.area")
-      .data(d => [[...d[1].entries()].sort((a, b) => a[0] - b[0])])
-      .join("path")
-      .attr("class", "area")
-      .attr("fill-opacity", 0.3)
       // .attr("d", entries => areaGenerator(entries));
 
     // bars, keyed by day so changed data updates in place instead of appending duplicates
-    groupsPerAuthor
-      .selectAll<SVGRectElement>("rect.counts")
-      .data(d => d[1])
+    canvas
+      .selectAll<SVGRectElement, ChartData>("rect.counts")
+      .data(data)
       .join(
         (enter) => {
             const rects = enter
@@ -160,7 +130,7 @@ const HistogramPlot = ({
       )
       .attr("x", (d) => xScale(d[0]) ?? -xScale.bandwidth())
       .attr("width", xScale.bandwidth())
-      .attr("data-value", (d) => d[1])
+      .attr("data-value", (d) => d)
       .attr("class", "counts");
   }, [data, binWidthMinutes, viewBoxWidth, viewBoxHeight, contentWidth]);
 

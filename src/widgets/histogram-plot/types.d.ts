@@ -6,7 +6,7 @@ export type WidgetConfiguration = {
     binSize: number;
 }
 
-export type ChartData = InternMap<string, InternMap<number, number>>
+export type ChartData = InternMap<number, number>
 
 export type ChartConfig = {
     viewBoxWidth?: number,

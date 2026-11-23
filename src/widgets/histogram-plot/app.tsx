@@ -42,7 +42,7 @@ const AppComponent = () => {
   const [host, setHost] = useState<EmbeddableWidgetAPI | "localhost">();
   const [isConfiguring, setIsConfiguring] = useState<boolean>(false);
 
-  const BIN_WIDTH_MINUTES = 7.5;
+  const BIN_WIDTH_MINUTES = 5;
   const [config, setConfig] = useState<WidgetConfiguration>();
 
   const isLocalhost = window.location.hostname === "localhost";
@@ -198,9 +198,8 @@ const AppComponent = () => {
         d => d[0],
         d => Math.floor(d[2] / BIN_WIDTH_MINUTES) * BIN_WIDTH_MINUTES
     )
-
-    setChartData(countMapByPersonAndBin);
-  }, [extractedDataPoints, selectedTimeAggregationKey]);
+    setChartData(countMapByPersonAndBin.get(selectedPerson) ?? new InternMap());
+  }, [extractedDataPoints, selectedPerson, selectedTimeAggregationKey]);
 
   if (isConfiguring) {
     return (
