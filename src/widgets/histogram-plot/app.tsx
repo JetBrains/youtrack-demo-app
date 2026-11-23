@@ -6,7 +6,7 @@ import "../../style/svg.css";
 
 import type {EmbeddableWidgetAPI, HostAPI } from "../../../@types/globals";
 
-import { Configuration } from "./Configuration.tsx";
+import Configuration from "./Configuration.tsx";
 
 import { extractAllPeople } from "../../utils/dataService.ts";
 import { evaluateFromPOV, extractRelevantInfo } from "../../utils/processingData.ts";
@@ -42,7 +42,6 @@ const AppComponent = () => {
   const [host, setHost] = useState<EmbeddableWidgetAPI | "localhost">();
   const [isConfiguring, setIsConfiguring] = useState<boolean>(false);
 
-  const BIN_WIDTH_MINUTES = 5;
   const [config, setConfig] = useState<WidgetConfiguration>();
 
   const isLocalhost = window.location.hostname === "localhost";
@@ -137,7 +136,7 @@ const AppComponent = () => {
     const { from, to } = timeframe;
     const fetchData = async () => {
       if (isLocalhost) {
-        return mockData(from, to, ["David", "Britta", "Cinna"], 200);
+        return mockData(from, to, ["David", "Britta", "Cinna"], 1000);
       }
 
       const newHost: HostAPI = await YTApp.register();
@@ -174,6 +173,10 @@ const AppComponent = () => {
       return;
     }
 
+    if (!config?.binSize) {
+      return
+    }
+
     const groupingFunction = timeAggregationOptions.get(selectedTimeAggregationKey)!.dateAggregationFunction;
 
     const minutesPerTimeframe = rollup(
@@ -183,7 +186,7 @@ const AppComponent = () => {
     )
 
     const maxY = max(minutesPerTimeframe, d => d[1] ?? 0) ?? 0
-    const upperBound = Math.ceil((maxY + 1) / BIN_WIDTH_MINUTES) * BIN_WIDTH_MINUTES;
+    const upperBound = Math.ceil((maxY + 1) / config?.binSize) * config?.binSize;
 
     const countByPersonAndBin = flatRollup(
         extractedDataPoints,
@@ -196,19 +199,11 @@ const AppComponent = () => {
         countByPersonAndBin,
         D => D.length,
         d => d[0],
-        d => Math.floor(d[2] / BIN_WIDTH_MINUTES) * BIN_WIDTH_MINUTES
+        d => Math.floor(d[2] / config.binSize) * config.binSize
     )
     setChartData(countMapByPersonAndBin.get(selectedPerson) ?? new InternMap());
   }, [extractedDataPoints, selectedPerson, selectedTimeAggregationKey]);
 
-  if (isConfiguring) {
-    return (
-        <Configuration
-            onDone={doneConfiguring}
-            currentConfiguration={config}
-        />
-    );
-  }
 
   return (
       <>
@@ -263,16 +258,28 @@ const AppComponent = () => {
             />
           </ButtonToolbar>
         </section>
-        <section id="graph" className="component" ref={(el: HTMLElement | null) => setPlotEl(el as HTMLDivElement | null)}>
           {
+            isConfiguring 
+            &&
+            <section id="graph" className="component" ref={(el: HTMLElement | null) => setPlotEl(el as HTMLDivElement | null)}>
+              <Configuration 
+                onDone={doneConfiguring}
+                currentConfiguration={config}
+              />
+            </section>
+          }
+          {
+            isConfiguring === false 
+            &&
+            <section id="graph" className="component" ref={(el: HTMLElement | null) => setPlotEl(el as HTMLDivElement | null)}>
               <HistogramPlot
                   data={chartData}
                   width={containerWidth}
                   height={containerHeight}
-                  binWidthMinutes={BIN_WIDTH_MINUTES}
-              />
+                  binWidthMinutes={config?.binSize}
+              /> 
+            </section>
           }
-        </section>
       </>
   );
 };

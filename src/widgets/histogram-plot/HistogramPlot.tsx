@@ -2,7 +2,7 @@
 import { useRef, useEffect, useMemo } from "react";
 import type { ChartConfig, ChartData, ChartDataPoint } from "./types.d.ts";
 
-import { max, range } from "d3-array";
+import { every, max, range } from "d3-array";
 import { select } from "d3-selection";
 import { scaleBand, scaleLinear } from "d3-scale";
 import { axisLeft, axisBottom } from "d3-axis";
@@ -10,7 +10,7 @@ import { axisLeft, axisBottom } from "d3-axis";
 import "d3-transition";
 
 import { margins } from "../../utils/constants.ts";
-import { area, curveBasis, curveMonotoneY, curveNatural, curveStep } from "d3";
+import { area, curveBasis, curveBumpX, curveMonotoneX, curveMonotoneY, curveNatural, curveStep, curveStepBefore } from "d3";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;
@@ -80,7 +80,8 @@ const HistogramPlot = ({
       .select<SVGGElement>(".x.axis")
       .transition()
       .duration(duration)
-      .call(axisBottom(xScale));
+      .call(axisBottom(xScale)
+      .tickFormat(d => `≥${d}m`));
 
     pinnedAxes
       .select<SVGGElement>(".y.axis")
@@ -90,14 +91,25 @@ const HistogramPlot = ({
 
     const canvas = svg.select(".canvas");
     
-    // each inner map entry is [minutes, count]: the key picks the band (x), the value the y position.
-    // the area is vertical: x follows the band centre, y0 is the baseline, y1 the count.
     const areaGenerator = area<[number, number]>()
-      .x(([minutes]) => (xScale(minutes) ?? 0) + xScale.bandwidth() / 2)
+      .x(d => (xScale(d[0]) ?? 0) + xScale.bandwidth() / 2)
       .y0(yScale(0))
-      .y1(([, count]) => yScale(count))
-      .curve(curveMonotoneY);
-      // .attr("d", entries => areaGenerator(entries));
+      .y1(d => yScale(d[1]))
+      .curve(curveBumpX);
+
+    // one point per band (bands are already in ascending order); bands without data count as 0
+    const points = bands.map((band): [number, number] => [band, data.get(band) ?? 0]);
+
+    // bind the generated curve to the (single) path.area in g.canvas, creating it on first render
+    canvas
+      .selectAll<SVGPathElement, [number, number][]>("path.area")
+      .data([points])
+      .join("path")
+      .attr("class", "area")
+      .attr("d", d => areaGenerator(d))
+      .attr("stroke", "red")
+      .attr("stroke-width", 3)
+      .attr("fill-opacity", 0.4);
 
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     canvas
@@ -131,7 +143,7 @@ const HistogramPlot = ({
       .attr("x", (d) => xScale(d[0]) ?? -xScale.bandwidth())
       .attr("width", xScale.bandwidth())
       .attr("data-value", (d) => d)
-      .attr("class", "counts");
+      .attr("class", "counts").attr("fill-opacity", 0.4);
   }, [data, binWidthMinutes, viewBoxWidth, viewBoxHeight, contentWidth]);
 
   
