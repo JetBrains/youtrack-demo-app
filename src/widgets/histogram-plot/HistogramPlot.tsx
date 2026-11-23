@@ -11,6 +11,7 @@ import "d3-transition";
 
 import { margins } from "../../utils/constants.ts";
 import { area, curveBasis, curveBumpX, curveMonotoneX, curveMonotoneY, curveNatural, curveStep, curveStepBefore } from "d3";
+import type { CurveFactory } from "d3-shape";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;
@@ -19,7 +20,9 @@ const HistogramPlot = ({
   data,
   width,
   height,
-  binWidthMinutes
+  binWidthMinutes,
+  maxX,
+  maxY
 }: ChartConfig) => {
   const pinnedRef = useRef<SVGSVGElement>(null);
   const chartRef = useRef<SVGSVGElement>(null);
@@ -28,16 +31,7 @@ const HistogramPlot = ({
 
   const viewBoxHeight = height > 0 ? height : 0;
   const viewBoxWidth = width > 0 ? width : 0;
-  const maxCounts = useMemo(
-    () => max(data.values()) ?? 0,
-    [data]
-  );
-  const maxMinutes = useMemo(
-    () => max(data.keys()) ?? 0,
-    [data]
-  );
-
-  const bands = useMemo(() => range(0, maxMinutes, binWidthMinutes), [maxMinutes]);
+  const bands = useMemo(() => range(0, maxX, binWidthMinutes), [maxX, binWidthMinutes]);
 
   // the scrolling area is everything right of the pinned y-axis; it must be wider than
   // the visible area, otherwise .scroll-area has nothing to scroll
@@ -61,18 +55,18 @@ const HistogramPlot = ({
 
     // animate only when the data or category toggles changed (and it is not the first paint);
     // resizes must update instantly, otherwise every resize tick restarts all transitions
-    const dataChanged = previousDataRef.current !== null && previousDataRef.current !== data;
-    previousDataRef.current = data;
+    const dataChanged = previousDataRef.current !== null;
 
     const duration = dataChanged ? TRANSITION_MS : 0;
 
     const xScale = scaleBand<number>()
       .domain(bands)
       .range([0, contentWidth])
-      .padding(0.2);
+      .paddingInner(0.2)
+      .paddingOuter(0.4);
 
     const yScale = scaleLinear()
-      .domain([0, maxCounts ?? 0])
+      .domain([0, maxY ?? 0])
       .range([canvasHeight, 0])
       .nice();
 
@@ -90,26 +84,16 @@ const HistogramPlot = ({
       .call(axisLeft(yScale));
 
     const canvas = svg.select(".canvas");
-    
-    const areaGenerator = area<[number, number]>()
-      .x(d => (xScale(d[0]) ?? 0) + xScale.bandwidth() / 2)
-      .y0(yScale(0))
-      .y1(d => yScale(d[1]))
-      .curve(curveBumpX);
-
-    // one point per band (bands are already in ascending order); bands without data count as 0
-    const points = bands.map((band): [number, number] => [band, data.get(band) ?? 0]);
 
     // bind the generated curve to the (single) path.area in g.canvas, creating it on first render
-    canvas
-      .selectAll<SVGPathElement, [number, number][]>("path.area")
-      .data([points])
-      .join("path")
-      .attr("class", "area")
-      .attr("d", d => areaGenerator(d))
-      .attr("stroke", "red")
-      .attr("stroke-width", 3)
-      .attr("fill-opacity", 0.4);
+    // canvas
+    //   .selectAll<SVGPathElement, [number, number][]>("path.area")
+    //   .data([points])
+    //   .join("path")
+    //   .attr("class", "area")
+    //   .attr("d", d => areaGenerator(d))
+    //   .attr("stroke-width", 3)
+    //   .attr("fill-opacity", 0.4);
 
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     canvas

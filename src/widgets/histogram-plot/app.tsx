@@ -28,8 +28,8 @@ import { timeAggregationOptions } from "../../utils/constants.ts";
 import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
 
 import HistogramPlot from "./HistogramPlot.tsx";
-import {flatRollup} from "d3";
-import {InternMap, max, rollup, sum} from "d3-array";
+
+import {flatRollup, InternMap, max, rollup, sum} from "d3-array";
 
 
 const AppComponent = () => {  
@@ -45,6 +45,9 @@ const AppComponent = () => {
   const [config, setConfig] = useState<WidgetConfiguration>();
 
   const isLocalhost = window.location.hostname === "localhost";
+
+  const [maxX, setMaxX] = useState<number>(0);
+  const [maxY, setMaxY] = useState<number>(0);
 
   const register = async () => {
     if (isLocalhost) {
@@ -177,16 +180,13 @@ const AppComponent = () => {
       return
     }
 
-    const groupingFunction = timeAggregationOptions.get(selectedTimeAggregationKey)!.dateAggregationFunction;
+    const groupingFunction = timeAggregationOptions.get(config.groupWorkItemsBy)!.dateAggregationFunction;
 
     const minutesPerTimeframe = rollup(
         extractedDataPoints,
         D => sum(D.map(d => d.minutes)),
         d => groupingFunction(d.date)
     )
-
-    const maxY = max(minutesPerTimeframe, d => d[1] ?? 0) ?? 0
-    const upperBound = Math.ceil((maxY + 1) / config?.binSize) * config?.binSize;
 
     const countByPersonAndBin = flatRollup(
         extractedDataPoints,
@@ -195,14 +195,24 @@ const AppComponent = () => {
         d => groupingFunction(d.date)
     )
 
+    const fallbackSize = config.binSize
     const countMapByPersonAndBin: ChartData = rollup(
         countByPersonAndBin,
         D => D.length,
         d => d[0],
         d => Math.floor(d[2] / config.binSize) * config.binSize
     )
+    
+    const flatCountMap = flatRollup(
+        countByPersonAndBin,
+        D => D.length,
+        d => d[0],
+        d => Math.floor(d[2] / config.binSize) * config.binSize
+    )
+    setMaxX(max(flatCountMap, d=> d[1]) ?? 0)
+    setMaxY(max(flatCountMap, d => d[2]) ?? 0)
     setChartData(countMapByPersonAndBin.get(selectedPerson) ?? new InternMap());
-  }, [extractedDataPoints, selectedPerson, selectedTimeAggregationKey]);
+  }, [extractedDataPoints, selectedPerson, config]);
 
 
   return (
@@ -225,7 +235,7 @@ const AppComponent = () => {
 
             {/*<Button onClick={() => loadData()}>Refresh Data</Button>*/}
 
-            <ButtonGroup>
+            {/* <ButtonGroup>
               {Array.from(timeAggregationOptions.keys()).map((key) => {
                 return (
                     <Button
@@ -238,7 +248,7 @@ const AppComponent = () => {
                     </Button>
                 )
               })}
-            </ButtonGroup>
+            </ButtonGroup> */}
 
             <Button onClick={() => setIsConfiguring(!isConfiguring)}>
               Configure
@@ -277,6 +287,8 @@ const AppComponent = () => {
                   width={containerWidth}
                   height={containerHeight}
                   binWidthMinutes={config?.binSize}
+                  maxX={maxX}
+                  maxY={maxY}
               /> 
             </section>
           }

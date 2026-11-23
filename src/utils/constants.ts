@@ -1,6 +1,6 @@
 import { scaleDiverging, timeDay, timeFormat, timeMonday, timeMonth, timeYear } from "d3";
 import { TimeAggregationOption } from "./classes.ts";
-import { startOfQuarter } from "date-fns/fp";
+import { formatDurationWithOptions, intervalToDuration, startOfQuarter } from "date-fns/fp";
 
 
 // export const colorScaleContributionLinear = scaleDiverging(["#ff1f6b", "#ffef5b", "#008d4b"]);
@@ -29,3 +29,11 @@ export const timeAggregationOptions: Map<string, TimeAggregationOption> = new Ma
         ["year", new TimeAggregationOption(timeYear, timeFormat("%Y"))]
     ]
 )
+
+export const readableDuration = (minutes: number) => {
+    const interval = intervalToDuration({
+        start: 0,
+        end: minutes * 60 * 1000
+    })
+    return formatDurationWithOptions({ zero: false } , interval);
+}

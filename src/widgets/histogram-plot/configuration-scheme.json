@@ -13,6 +13,14 @@
     "binSize": {
       "title": "Value for the width in minutes",
       "type": "number"
+    },
+    "groupWorkItemsBy": {
+      "title": "Group workitems by",
+      "type": "string"
+    },
+    "timeframe": {
+        "type": "object",
+        "title": "For relative timeframes"
     }
   }
 }

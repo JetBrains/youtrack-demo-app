@@ -8,6 +8,7 @@ text {
 
 g.canvas :is(path, rect, circle) {
     fill: var(--ring-main-color);
+    stroke: var(--ring-main-color);
 }
 
 g.axes line {
