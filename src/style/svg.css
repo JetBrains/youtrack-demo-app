@@ -6,6 +6,10 @@ text {
   font-size: var(--ring-font-size);
 }
 
+g.canvas :is(path, rect, circle) {
+    fill: var(--ring-main-color);
+}
+
 g.axes line {
   stroke: currentColor;
   opacity: 0.05;
