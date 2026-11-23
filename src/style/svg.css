@@ -6,10 +6,6 @@ text {
   font-size: var(--ring-font-size);
 }
 
-g.canvas * {
-  fill: currentColor;
-}
-
 g.axes line {
   stroke: currentColor;
   opacity: 0.05;

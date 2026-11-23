@@ -19,7 +19,8 @@ import DatePicker from "@jetbrains/ring-ui-built/components/date-picker/date-pic
 
 import type {author, ExtractedDataPoint, FetchedDataPoint} from "../../utils/types";
 import type {
-  ChartDataPoint, WidgetConfiguration,
+  ChartData,
+  WidgetConfiguration,
 } from "./types.d.ts";
 
 import { mockData } from "../../utils/mockData.ts";
@@ -27,8 +28,10 @@ import { timeAggregationOptions } from "../../utils/constants.ts";
 import { useResizeObserver } from "../../hooks/useResizeObserver.ts";
 
 import HistogramPlot from "./HistogramPlot.tsx";
-import {bin, flatRollup, map} from "d3";
-import {max, range, rollup, sum} from "d3-array";
+import {flatRollup} from "d3";
+import {InternMap, max, rollup, sum} from "d3-array";
+
+const BIN_WIDTH_MINUTES = 5;
 
 const AppComponent = () => {
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
@@ -128,7 +131,7 @@ const AppComponent = () => {
   const [authors, setAuthors] = useState<author[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<string>("");
 
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [chartData, setChartData] = useState<ChartData>(new InternMap());
 
   const loadData = async () => {
     const { from, to } = timeframe;
@@ -178,20 +181,9 @@ const AppComponent = () => {
         D => sum(D.map(d => d.minutes)),
         d => groupingFunction(d.date)
     )
-    const BIN_MINUTES = 5
-    const minutesPerPersonAndTimeframe = rollup(
-        extractedDataPoints,
-        D => sum(D.map(d => d.minutes)),
-        d => d.authorId,
-        d => groupingFunction(d.date)
-    )
 
-    const maxY = max(minutesPerTimeframe, d => d[1])
-    const upperBound = Math.ceil((maxY + 1) / BIN_MINUTES) * BIN_MINUTES;
-    const binner = bin()
-        .value(d => d)
-        .domain([0, maxY])
-        .thresholds(range(0, upperBound, BIN_MINUTES));
+    const maxY = max(minutesPerTimeframe, d => d[1] ?? 0) ?? 0
+    const upperBound = Math.ceil((maxY + 1) / BIN_WIDTH_MINUTES) * BIN_WIDTH_MINUTES;
 
     const countByPersonAndBin = flatRollup(
         extractedDataPoints,
@@ -200,15 +192,15 @@ const AppComponent = () => {
         d => groupingFunction(d.date)
     )
 
-    const countMapByPersonAndBin = rollup(
+    const countMapByPersonAndBin: ChartData = rollup(
         countByPersonAndBin,
         D => D.length,
         d => d[0],
-        d => Math.floor(d[2] / BIN_MINUTES) * BIN_MINUTES
+        d => Math.floor(d[2] / BIN_WIDTH_MINUTES) * BIN_WIDTH_MINUTES
     )
 
-    setChartData([...countMapByPersonAndBin]);
-  }, [extractedDataPoints, selectedPerson, selectedTimeAggregationKey]);
+    setChartData(countMapByPersonAndBin);
+  }, [extractedDataPoints, selectedTimeAggregationKey]);
 
   if (isConfiguring) {
     return (
@@ -278,8 +270,7 @@ const AppComponent = () => {
                   data={chartData}
                   width={containerWidth}
                   height={containerHeight}
-                  isResizing={isResizing}
-                  timeAggregation={timeAggregationOptions.get(selectedTimeAggregationKey)!}
+                  binWidthMinutes={BIN_WIDTH_MINUTES}
               />
           }
         </section>

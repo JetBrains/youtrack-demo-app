@@ -1,6 +1,6 @@
 // we only feed raw data into the component.
 import { useRef, useEffect, useMemo } from "react";
-import type { ChartDataPoint } from "./types.d.ts";
+import type { ChartConfig, ChartDataPoint } from "./types.d.ts";
 
 import { max, range } from "d3-array";
 import { select } from "d3-selection";
@@ -10,27 +10,16 @@ import { axisLeft, axisBottom } from "d3-axis";
 import "d3-transition";
 
 import { margins } from "../../utils/constants.ts";
-import { TimeAggregationOption } from "../../utils/classes.ts";
-
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;
-
-type Bin = { start: number; count: number };
 
 const HistogramPlot = ({
   data,
   width,
   height,
-  isResizing,
-  timeAggregation
-}: {
-  data: ChartDataPoint[];
-  width: number;
-  height: number;
-  isResizing: boolean;
-  timeAggregation: TimeAggregationOption
-}) => {
+  binWidthMinutes
+}: ChartConfig) => {
   const pinnedRef = useRef<SVGSVGElement>(null);
   const chartRef = useRef<SVGSVGElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -38,15 +27,18 @@ const HistogramPlot = ({
 
   const viewBoxHeight = height > 0 ? height : 0;
   const viewBoxWidth = width > 0 ? width : 0;
-
-  const BIN_SIZE_MINUTES = 10;
-  const maxMinutes = Math.max(
-    BIN_SIZE_MINUTES,
-    Math.ceil((max(data, (d) => d.minutes) ?? 0) / BIN_SIZE_MINUTES) * BIN_SIZE_MINUTES,
+  const BIN_SIZE_MINUTES = 5
+  const maxCounts = useMemo(
+    () => max(data.values(), inner => max(inner.values())) ?? 0,
+    [data]
   );
-
+  const maxMinutes = useMemo(
+    () => max(data.values(), inner => max(inner.keys())) ?? 0,
+    [data]
+  );
   // one band per bin, identified by its start in minutes: 0, BIN_SIZE_MINUTES, ... maxMinutes - BIN_SIZE_MINUTES
-  const bands = useMemo(() => range(0, maxMinutes, BIN_SIZE_MINUTES), [maxMinutes]);
+
+  const bands = useMemo(() => range(0, maxMinutes, binWidthMinutes), [maxMinutes]);
   // number of data points falling into each band (a value equal to maxMinutes lands in the last band)
   const bins = useMemo(() => {
     const counts = bands.map((start) => ({ start, count: 0 }));
@@ -87,19 +79,13 @@ const HistogramPlot = ({
 
     const duration = dataChanged ? TRANSITION_MS : 0;
 
-    const {
-      dateAggregationFunction,
-      tickValueFormattingFunction
-    } = timeAggregation
-
-
     const xScale = scaleBand<number>()
       .domain(bands)
       .range([0, contentWidth])
       .padding(0.2);
 
     const yScale = scaleLinear()
-      .domain([0, max(bins, (d) => d.count) ?? 0])
+      .domain([0, maxCounts ?? 0])
       .range([canvasHeight, 0])
       .nice();
 
@@ -116,24 +102,33 @@ const HistogramPlot = ({
       .call(axisLeft(yScale));
 
     const canvas = svg.select(".canvas");
+    const groupsPerAuthor = canvas.selectAll("g")
+      .data(data)
+      .enter()
+      .append("g")
+      .attr("class", "author")
+      .attr("data-author", d => d[0])
+      .attr("stroke", (_, i) => ["red", "blue", "green"][i])
+      .attr("stroke-width", 1)
+      .attr("fill", "none");
+    
     // bars, keyed by day so changed data updates in place instead of appending duplicates
-    canvas
-      .selectAll<SVGRectElement, Bin>("rect.counts")
-      .data(bins, (d) => d.start)
+    groupsPerAuthor
+      .selectAll<SVGRectElement>("rect.counts")
+      .data(d => d[1])
       .join(
         (enter) => {
             const rects = enter
                 .append("rect")
                 .attr("y", canvasHeight)
-                .attr("height", 0)
-                .attr("opacity", 0.2);
+                .attr("height", 0);
 
               rects
                 .transition()
                 .duration(duration)
                 .delay((_, i) => i * 10)
-                .attr("y", (d) => yScale(d.count))
-                .attr("height", (d) => canvasHeight - yScale(d.count));
+                .attr("y", (d) => yScale(d[1]))
+                .attr("height", (d) => canvasHeight - yScale(d[1]));
 
             rects.append("title");
             return rects;
@@ -141,16 +136,16 @@ const HistogramPlot = ({
         (update) => update
                       .transition()
                       .duration(duration)
-                      .attr("y", (d) => yScale(d.count))
-                      .attr("height", (d) => canvasHeight - yScale(d.count)),
+                      .attr("y", (d) => yScale(d[1]))
+                      .attr("height", (d) => canvasHeight - yScale(d[1])),
 
         (exit) => exit.remove(),
       )
-      .attr("x", (d) => xScale(d.start) ?? -xScale.bandwidth())
+      .attr("x", (d) => xScale(d[0]) ?? -xScale.bandwidth())
       .attr("width", xScale.bandwidth())
-      .attr("data-value", (d) => d.count)
+      .attr("data-value", (d) => d[1])
       .attr("class", "counts");
-  }, [data, bins, bands, viewBoxWidth, viewBoxHeight, contentWidth, timeAggregation]);
+  }, [data, bands, viewBoxWidth, viewBoxHeight, contentWidth]);
 
   
   // hovering the chart + mouse wheel scrolls it horizontally, handled via d3's event binding
@@ -193,7 +188,7 @@ const HistogramPlot = ({
 
   const canvasHeight = viewBoxHeight - margins.top - margins.bottom;
   return (
-    <div className={`scrollable-canvas ${isResizing ? "resizing" : ""}`}>
+    <div className={`scrollable-canvas`}>
       <svg
         ref={pinnedRef}
         className="pinned axes"
