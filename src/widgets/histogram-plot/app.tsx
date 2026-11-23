@@ -31,9 +31,8 @@ import HistogramPlot from "./HistogramPlot.tsx";
 import {flatRollup} from "d3";
 import {InternMap, max, rollup, sum} from "d3-array";
 
-const BIN_WIDTH_MINUTES = 5;
 
-const AppComponent = () => {
+const AppComponent = () => {  
   const [plotEl, setPlotEl] = useState<HTMLDivElement | null>(null);
   const {
     width: containerWidth,
@@ -43,6 +42,7 @@ const AppComponent = () => {
   const [host, setHost] = useState<EmbeddableWidgetAPI | "localhost">();
   const [isConfiguring, setIsConfiguring] = useState<boolean>(false);
 
+  const BIN_WIDTH_MINUTES = 7.5;
   const [config, setConfig] = useState<WidgetConfiguration>();
 
   const isLocalhost = window.location.hostname === "localhost";

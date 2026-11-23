@@ -10,6 +10,7 @@ import { axisLeft, axisBottom } from "d3-axis";
 import "d3-transition";
 
 import { margins } from "../../utils/constants.ts";
+import { area, curveBasis, curveMonotoneY, curveNatural, curveStep } from "d3";
 
 const TRANSITION_MS = 500;
 const MIN_STEP_WIDTH = 30;
@@ -27,7 +28,6 @@ const HistogramPlot = ({
 
   const viewBoxHeight = height > 0 ? height : 0;
   const viewBoxWidth = width > 0 ? width : 0;
-  const BIN_SIZE_MINUTES = 5
   const maxCounts = useMemo(
     () => max(data.values(), inner => max(inner.values())) ?? 0,
     [data]
@@ -110,8 +110,25 @@ const HistogramPlot = ({
       .attr("data-author", d => d[0])
       .attr("stroke", (_, i) => ["red", "blue", "green"][i])
       .attr("stroke-width", 1)
-      .attr("fill", "none");
+      .attr("fill", (_, i) => ["red", "blue", "green"][i])
+      .attr("fill-opacity", 0.33);
     
+    // each inner map entry is [minutes, count]: the key picks the band (x), the value the y position.
+    // the area is vertical: x follows the band centre, y0 is the baseline, y1 the count.
+    const areaGenerator = area<[number, number]>()
+      .x(([minutes]) => (xScale(minutes) ?? 0) + xScale.bandwidth() / 2)
+      .y0(yScale(0))
+      .y1(([, count]) => yScale(count))
+      .curve(curveMonotoneY);
+
+    groupsPerAuthor
+      .selectAll<SVGPathElement, [number, number][]>("path.area")
+      .data(d => [[...d[1].entries()].sort((a, b) => a[0] - b[0])])
+      .join("path")
+      .attr("class", "area")
+      .attr("fill-opacity", 0.3)
+      // .attr("d", entries => areaGenerator(entries));
+
     // bars, keyed by day so changed data updates in place instead of appending duplicates
     groupsPerAuthor
       .selectAll<SVGRectElement>("rect.counts")
@@ -145,7 +162,7 @@ const HistogramPlot = ({
       .attr("width", xScale.bandwidth())
       .attr("data-value", (d) => d[1])
       .attr("class", "counts");
-  }, [data, bands, viewBoxWidth, viewBoxHeight, contentWidth]);
+  }, [data, binWidthMinutes, viewBoxWidth, viewBoxHeight, contentWidth]);
 
   
   // hovering the chart + mouse wheel scrolls it horizontally, handled via d3's event binding
