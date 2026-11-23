@@ -54,41 +54,12 @@ body {
   }
 }
 
-#summary {
-  grid-area: summary;
-}
-
 #header {
   grid-area: header;
 }
 
 #dummy {
   stroke: 1px solid red;
-}
-
-/* styling svg text and lines the same way as native p-element text */
-text {
-  fill: currentColor;
-  font-family: var(--ring-font-family);
-  font-size: var(--ring-font-size);
-}
-
-g.canvas rect.total-minutes {
-  fill: currentColor;
-  opacity: .1;
-}
-
-g.grid line {
-  stroke: currentColor;
-  opacity: 0.05;
-}
-
-.benchmark {
-  opacity: 0.25;
-}
-
-.axis line, .axis path {
-  stroke: currentColor;
 }
 
 /* scrollable hours-per-day chart: pinned y-axis + horizontally scrolling bars */
